@@ -495,6 +495,26 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     pulled: { label: 'Pulled in', tone: 't-warn' },
   };
   const AREAS = ['Cardiology', 'Pulmonology', 'Critical care', 'Gastroenterology & hepatology', 'Nephrology', 'Endocrinology', 'Hematology & oncology', 'Infectious disease', 'Rheumatology', 'Neurology', 'Geriatrics & general IM', 'Other'];
+  // Plan rows store the exact AMBOSS filter label; the app shows the specialty name.
+  // AMBOSS has no Cardiology or Nephrology discipline: specialties map to Systems,
+  // except ID, oncology, critical care and geriatrics, which are Disciplines.
+  const SPECIALTY = {
+    'Cardiovascular System': 'Cardiology',
+    'Respiratory System': 'Pulmonology',
+    'Gastrointestinal System': 'Gastroenterology and hepatology',
+    'Renal & Urinary Systems': 'Nephrology',
+    'Endocrine System': 'Endocrinology',
+    'Blood & Lymphoreticular Systems': 'Hematology',
+    'Musculoskeletal System': 'Rheumatology and musculoskeletal',
+    'Immune System': 'Immunology and allergy',
+    'Nervous System & Special Senses': 'Neurology',
+    'Skin & Subcutaneous Tissue': 'Dermatology',
+    'Behavioral Health': 'Psychiatry',
+    'Infectious diseases': 'Infectious disease',
+    'Oncology': 'Oncology',
+    'Critical care': 'Critical care',
+    'Aging': 'Geriatrics',
+  };
 
   // ---------- state ----------
   let db = null;
@@ -593,7 +613,8 @@ td.topic-cell { white-space: normal; min-width: 140px; }
   }
   function topicTitle(st) {
     if (st.kind === 'review') return 'Review: your marked questions';
-    return st.topic || 'Any system (no topic assigned yet)';
+    if (!st.topic) return 'Any topic (none assigned yet)';
+    return SPECIALTY[st.topic] || st.topic;
   }
 
   // ---------- writes ----------

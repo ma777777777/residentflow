@@ -7,4 +7,4 @@
 - Do not add AMBOSS scraping or automatic sync. AMBOSS has no personal-data API.
 - Keep it $0: no paid services, no paid APIs.
 - Plain JavaScript, no build step, no dependencies. Dates are local `YYYY-MM-DD` strings; weeks run Sunday to Saturday.
-- Weekly plan rows: shuffled AMBOSS systems, weighted toward cardiovascular and the current or next rotation. Topic names must match AMBOSS filter labels exactly (for example `Renal & Urinary Systems`; infectious disease is `Disciplines: Infectious diseases`).
+- Weekly plan rows: shuffled specialties, weighted toward cardiology and the current or next rotation. Store the exact AMBOSS filter label in `topic` and `filter`; the app shows the specialty name (map in `SPECIALTY`). In AMBOSS ABIM, organ specialties are Systems (cardiology = `Cardiovascular System`, nephrology = `Renal & Urinary Systems`, rheumatology = `Musculoskeletal System`, and so on); there is no Cardiology or Nephrology discipline. Only these are Disciplines: `Infectious diseases`, `Oncology`, `Critical care`, `Aging` (geriatrics).
