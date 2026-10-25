@@ -7,6 +7,7 @@ Live app (private, sign-in required): https://claude.ai/artifact/1fRAEuyTcWiVgte
 ## What phase 1 does
 
 - **Today**: rotation, day type (night shift, on call, post-call, off, pulled in), and one study job: N AMBOSS ABIM questions on an assigned topic, with the exact filter steps and a fixed time slot. One tap to log it as done or skipped. Optional extras: pearl reviews and Anki (Me Deck and MGH only).
+- **Sessions**: the department's weekly teaching activities, with resident sessions (grand rounds, morning report, core curriculum, journal club) shown on Today and optional division teaching folded away.
 - **Schedule**: next 14 days and all 26 blocks of AY 2026-27. Tap a day to mark it on call, post-call, off, or pulled in.
 - **Study**: questions this week against the weekly target, the last 8 weeks, AMBOSS progress, history, and a JSON backup.
 - **Pearls**: one-line clinical pearls with a patient-information check, reviewed at 3 days and 2 weeks, then retired. Detailed notes stay in OneNote.
@@ -34,6 +35,7 @@ Live app (private, sign-in required): https://claude.ai/artifact/1fRAEuyTcWiVgte
 | `days` | date | `type` (`auto`, `normal`, `call`, `postcall`, `off`, `pulled`), `rough` |
 | `extras` | date | `anki` |
 | `captures` | auto id | `text`, `area`, `link`, `created`, `stage`, `nextReview`, `status` (`active`, `retired`) |
+| `sessions` | date and slug (`2026-10-27-grand-rounds`) | `date`, `start`, `end` (24 h `HH:MM`), `title`, `topic`, `place`, `kind` (`core` for resident sessions, `optional` for division teaching), `source` |
 | `settings` | `main` | `weeklyTarget`, `minDay`, `examLabel`, `examMonth`, `amboss` {`answered`, `total`, `pct`, `epc`, `percentile`, `asOf`} |
 
 ## Changing the app

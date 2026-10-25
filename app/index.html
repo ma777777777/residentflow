@@ -340,6 +340,19 @@ td.topic-cell { white-space: normal; min-width: 140px; }
 .pearl .actions { margin-top: 10px; }
 .pearl.retired .pearl-text { color: var(--muted); }
 
+/* sessions */
+.sess { display: grid; grid-template-columns: 88px 1fr; gap: 10px; padding: 12px 14px; }
+.sess + .sess { border-top: 1px solid var(--line); }
+.sess-time { font-family: var(--mono); font-variant-numeric: tabular-nums; font-size: 13px; line-height: 1.35; padding-top: 2px; }
+.sess-time small { display: block; color: var(--muted); font-size: 12px; }
+.sess-title { font-weight: 700; font-size: 15px; }
+.sess-sub { font-size: 14px; color: var(--muted); }
+.more > summary { padding: 12px 14px; border-top: 1px solid var(--line); color: var(--accent); font-weight: 700; font-size: 15px; cursor: pointer; }
+.more[open] > summary { border-bottom: 1px solid var(--line); }
+.drow small.sn { display: block; font-size: 13px; color: var(--muted); }
+.sheet .sess { padding: 10px 0; }
+.sheet .sec-h h2 { font-size: 13px; }
+
 /* banner, empty, loading */
 .banner { padding: 12px 14px; border-radius: 12px; background: var(--warn-soft); font-size: 15px; margin-bottom: 14px; }
 .empty { padding: 22px 16px; text-align: center; color: var(--muted); font-size: 15px; }
@@ -527,6 +540,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     days: {},
     extras: {},
     captures: [],
+    sessions: {},
     settings: {},
     form: null, // { ds, q, pct }
     sheet: null, // { kind: 'day', ds } | { kind: 'capture' }
@@ -606,6 +620,31 @@ td.topic-cell { white-space: normal; min-width: 140px; }
   function pearlsDue(ds) {
     return S.captures.filter((c) => c.status !== 'retired' && c.nextReview && c.nextReview <= ds);
   }
+  function sessionsOn(ds) {
+    return Object.entries(S.sessions)
+      .map(([id, x]) => Object.assign({ id }, x))
+      .filter((x) => x.date === ds)
+      .sort((a, b) => ((a.start || '') < (b.start || '') ? -1 : 1));
+  }
+  function fmtTime(t) {
+    const [h, m] = String(t || '').split(':').map(Number);
+    if (isNaN(h)) return '';
+    return `${((h + 11) % 12) + 1}:${pad(m || 0)} ${h >= 12 ? 'pm' : 'am'}`;
+  }
+  function sessRows(list) {
+    return list.map((x) => `<div class="sess"><div class="sess-time">${esc(fmtTime(x.start))}<small>to ${esc(fmtTime(x.end))}</small></div><div><div class="sess-title">${esc(x.title)}</div>${x.topic ? `<div class="sess-sub">${esc(x.topic)}</div>` : ''}${x.place ? `<div class="sess-sub">${esc(x.place)}</div>` : ''}</div></div>`).join('');
+  }
+  function sessionsCard(ds, di) {
+    const list = sessionsOn(ds);
+    if (!list.length) return '';
+    const core = list.filter((x) => x.kind === 'core');
+    const opt = list.filter((x) => x.kind !== 'core');
+    const away = ['night', 'call', 'postcall', 'vacation'].includes(di.type);
+    let h = `<div class="sec-h"><h2>Sessions today</h2>${away ? `<span class="small muted">optional on ${esc(typeLabel(di).toLowerCase())} days</span>` : ''}</div><section class="card list-card">`;
+    h += core.length ? sessRows(core) : '<div class="empty">No resident sessions today.</div>';
+    if (opt.length) h += `<details class="more"><summary>${plural(opt.length, 'division session')}, optional</summary>${sessRows(opt)}</details>`;
+    return h + '</section>';
+  }
   function filterLine(st) {
     if (st.kind === 'review') return 'Status: Marked (questions you flagged)';
     if (!st.topic) return 'No filter: all systems';
@@ -679,6 +718,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     h += `<div class="sub-actions"><button class="link quiet" data-act="day-open" data-ds="${ds}">Not what today looks like? Change it</button></div></section>`;
 
     h += jobCard(ds, di, st);
+    h += sessionsCard(ds, di);
 
     // optional extras, at most two
     const due = pearlsDue(ds);
@@ -821,7 +861,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     const what = st.kind === 'rest' ? (st.reason || 'Rest') : topicTitle(st);
     return `<button class="drow${d === ds ? ' is-today' : ''}" data-act="day-open" data-ds="${d}">
       <span class="d">${esc(fmt(d, { weekday: 'short' }))} ${parse(d).getDate()}<small>${esc(fmt(d, { month: 'short' }))}</small></span>
-      <span class="t">${chip(di)}<div>${esc(what)}</div></span>
+      <span class="t">${chip(di)}<div>${esc(what)}</div>${(() => { const n = sessionsOn(d).filter((x) => x.kind === 'core').length; return n ? `<small class="sn">${plural(n, 'resident session')}</small>` : ''; })()}</span>
       <span class="q">${esc(q)}</span>
     </button>`;
   }
@@ -1016,6 +1056,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
         <button class="btn" data-act="rough" data-ds="${ds}" aria-pressed="${!!ov.rough}">${ov.rough ? 'Rough day is on: tap to turn off' : 'Rough day: cut to the minimum'}</button>
       </div>
       <p class="hint">On call and post-call days need no questions. Pulled in and rough days drop to the minimum.</p>
+      ${(() => { const l = sessionsOn(ds); return l.length ? `<div class="sec-h" style="margin:18px 0 0"><h2>Sessions</h2></div>${sessRows(l.filter((x) => x.kind === 'core'))}${l.some((x) => x.kind !== 'core') ? `<details class="more"><summary>${plural(l.filter((x) => x.kind !== 'core').length, 'division session')}, optional</summary>${sessRows(l.filter((x) => x.kind !== 'core'))}</details>` : ''}` : ''; })()}
       <div class="actions"><button class="btn ghost" data-act="sheet-close" data-autofocus>Close</button></div>
     </div>`;
   }
@@ -1150,7 +1191,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       let dl = null;
       try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
       if (!dl) { toast('Downloads are not available in this view.'); return; }
-      const data = { exportedAt: new Date().toISOString(), blocks: S.blocks, plan: S.plan, log: S.log, days: S.days, extras: S.extras, captures: S.captures, settings: S.settings };
+      const data = { exportedAt: new Date().toISOString(), blocks: S.blocks, plan: S.plan, log: S.log, days: S.days, extras: S.extras, captures: S.captures, sessions: S.sessions, settings: S.settings };
       try { await dl.save({ filename: `residentflow-backup-${todayStr()}.json`, data: JSON.stringify(data, null, 2) }); }
       catch (e) { if (!e || e.code !== 'declined') toast('Could not save the file.'); }
     },
@@ -1197,7 +1238,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     if (!c || typeof c.use !== 'function') { S.status = 'nodb'; render(); return; }
     try { db = await c.use('db'); } catch (e) { db = null; }
     if (!db) { S.status = 'nodb'; render(); return; }
-    const waiting = new Set(['blocks', 'plan', 'log', 'days', 'extras', 'captures', 'settings']);
+    const waiting = new Set(['blocks', 'plan', 'log', 'days', 'extras', 'captures', 'sessions', 'settings']);
     const arrived = (k) => {
       if (waiting.delete(k) && waiting.size === 0) S.status = 'ready';
       if (S.status !== 'loading') { render(); if (S.sheet && S.sheet.kind === 'day') renderSheet(); }
@@ -1213,7 +1254,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       S.blocks = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())).filter((b) => b.start && b.end).sort((a, b) => (a.start < b.start ? -1 : 1));
       arrived('blocks');
     }, onErr('blocks'));
-    keyed('plan'); keyed('log'); keyed('days'); keyed('extras');
+    keyed('plan'); keyed('log'); keyed('days'); keyed('extras'); keyed('sessions');
     db.collection('captures').onSnapshot((snap) => {
       S.captures = snap.docs.map((d) => Object.assign({ id: d.id }, d.data())).sort((a, b) => ((a.created || '') < (b.created || '') ? 1 : -1));
       arrived('captures');
