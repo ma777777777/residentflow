@@ -352,6 +352,9 @@ td.topic-cell { white-space: normal; min-width: 140px; }
 .drow small.sn { display: block; font-size: 13px; color: var(--muted); }
 .sheet .sess { padding: 10px 0; }
 .sheet .sec-h h2 { font-size: 13px; }
+.sheet .form { margin-top: 4px; padding-top: 0; border-top: 0; }
+.nudge { padding: 14px 16px; background: var(--warn-soft); border-color: transparent; }
+.nudge .sub-actions { margin-top: 4px; }
 
 /* banner, empty, loading */
 .banner { padding: 12px 14px; border-radius: 12px; background: var(--warn-soft); font-size: 15px; margin-bottom: 14px; }
@@ -717,6 +720,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     }
     h += `<div class="sub-actions"><button class="link quiet" data-act="day-open" data-ds="${ds}">Not what today looks like? Change it</button></div></section>`;
 
+    h += yesterdayNudge(ds);
     h += jobCard(ds, di, st);
     h += sessionsCard(ds, di);
 
@@ -739,7 +743,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
 
   function jobCard(ds, di, st) {
     const log = S.log[ds];
-    const formOpen = S.form && S.form.ds === ds;
+    const formOpen = S.form && S.form.ds === ds && !S.form.inSheet;
     if (log && log.status === 'done' && !formOpen) {
       const pct = typeof log.pct === 'number' ? `<span class="muted">${log.pct}% correct</span>` : '';
       return `<section class="card job is-done">
@@ -796,6 +800,34 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     return h + '</section>';
   }
 
+  // A planned study day that ended without a log: ask once, on the next day.
+  function yesterdayNudge(ds) {
+    const y = addDays(ds, -1);
+    if (S.log[y]) return '';
+    const st = studyFor(dayInfo(y));
+    if (!st.planned || !st.count || st.optional) return '';
+    return `<section class="card nudge">
+      <p><strong>Yesterday isn't logged.</strong> Did you do any questions on ${esc(fmt(y, { weekday: 'long' }))}?</p>
+      <div class="sub-actions"><button class="link" data-act="day-log" data-ds="${y}">Yes, log them</button><button class="link quiet" data-act="skip" data-ds="${y}">No, I skipped</button></div>
+    </section>`;
+  }
+  function logSection(ds) {
+    if (ds > todayStr()) return '';
+    const l = S.log[ds];
+    let h = '<div class="sec-h" style="margin:18px 0 0"><h2>Questions</h2></div>';
+    if (S.form && S.form.ds === ds && S.form.inSheet) return h + doneForm();
+    if (l && l.status === 'done') {
+      h += `<p class="hint">Logged: <strong>${num(l.questions, 0)} questions</strong>${typeof l.pct === 'number' ? `, ${l.pct}% correct` : ''}.</p>
+        <div class="sub-actions"><button class="link" data-act="done-open" data-ds="${ds}" data-in="sheet">Edit</button><button class="link quiet" data-act="undo" data-ds="${ds}">Undo</button></div>`;
+    } else if (l && l.status === 'skipped') {
+      h += `<p class="hint">Marked as skipped.</p>
+        <div class="sub-actions"><button class="link" data-act="done-open" data-ds="${ds}" data-in="sheet">Actually, I did some</button><button class="link quiet" data-act="undo" data-ds="${ds}">Undo</button></div>`;
+    } else {
+      h += `<p class="hint">Nothing logged for this day.</p>
+        <div class="actions"><button class="btn sm primary" data-act="done-open" data-ds="${ds}" data-in="sheet">Log questions</button></div>`;
+    }
+    return h;
+  }
   function doneForm() {
     const f = S.form;
     return `<div class="form">
@@ -1023,6 +1055,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
   }
   function closeSheet() {
     S.sheet = null;
+    if (S.form && S.form.inSheet) S.form = null;
     const el = $('#sheet');
     el.hidden = true; el.innerHTML = '';
     document.body.classList.remove('locked');
@@ -1044,6 +1077,8 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     return `<div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
       <h2 id="sheet-title">${esc(fmt(ds, { weekday: 'long', day: 'numeric', month: 'long' }))}</h2>
       <p class="hint">${di.rot ? esc(di.rot.label) + '. ' : ''}${st.count ? `${st.count} questions: ${esc(topicTitle(st))}.` : esc(st.reason)}</p>
+      ${logSection(ds)}
+      <div class="sec-h" style="margin:18px 0 0"><h2>Day type</h2></div>
       <div class="opts">
         ${opt('auto', 'From rotation (' + autoLabel + ')')}
         ${opt('normal', 'Working day')}
@@ -1118,11 +1153,19 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       const ds = el.dataset.ds;
       const l = S.log[ds];
       const st = studyFor(dayInfo(ds));
-      S.form = { ds, q: l && l.status === 'done' ? num(l.questions, 10) : (st.count || num(S.settings.minDay, 10)), pct: l && typeof l.pct === 'number' ? l.pct : '' };
+      S.form = { ds, q: l && l.status === 'done' ? num(l.questions, 10) : (st.count || num(S.settings.minDay, 10)), pct: l && typeof l.pct === 'number' ? l.pct : '', inSheet: el.dataset.in === 'sheet' };
       render();
+      if (S.sheet) renderSheet();
       const i = $('#f-q'); if (i) i.focus();
     },
-    'done-cancel'() { S.form = null; render(); },
+    'day-log'(el) {
+      const ds = el.dataset.ds;
+      const st = studyFor(dayInfo(ds));
+      S.form = { ds, q: st.count || num(S.settings.minDay, 10), pct: '', inSheet: true };
+      openSheet({ kind: 'day', ds });
+      const i = $('#f-q'); if (i) i.focus();
+    },
+    'done-cancel'() { S.form = null; render(); if (S.sheet) renderSheet(); },
     'q-step'(el) {
       const n = Number(el.dataset.n);
       S.form.q = Math.max(1, Math.min(300, (Number(S.form.q) || 0) + n));
@@ -1136,8 +1179,9 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       if (pct != null && (isNaN(pct) || pct < 0 || pct > 100)) { toast('Percent correct should be between 0 and 100, or left empty.'); return; }
       const st = studyFor(dayInfo(f.ds));
       const topic = st.kind === 'rest' ? 'Bonus questions' : topicTitle(st);
-      const ok = await write(() => docRef('log', f.ds).set({ status: 'done', questions: q, pct, topic, at: new Date().toISOString() }), `Logged ${q} questions. Nice.`);
-      if (ok) { S.form = null; render(); }
+      const when = f.ds === todayStr() ? '' : ` for ${fmtShort(f.ds)}`;
+      const ok = await write(() => docRef('log', f.ds).set({ status: 'done', questions: q, pct, topic, at: new Date().toISOString() }), `Logged ${q} questions${when}. Nice.`);
+      if (ok) { S.form = null; render(); if (S.sheet) renderSheet(); }
     },
     async more(el) {
       const ds = el.dataset.ds; const l = S.log[ds];
