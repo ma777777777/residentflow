@@ -6,7 +6,7 @@ Live app (private, sign-in required): https://claude.ai/artifact/1fRAEuyTcWiVgte
 
 ## What phase 1 does
 
-- **Today**: rotation, day type (night shift, on call, post-call, off, pulled in), and one study job: N AMBOSS ABIM questions on an assigned topic, with the exact filter steps and a fixed time slot. One tap to log it as done or skipped. Optional extras: pearl reviews and Anki (Me Deck and MGH only).
+- **Today**: rotation, day type (night shift, on call, post-call, off, pulled in), and one study job: N questions in an assigned module of the AMBOSS Internal Medicine (ABIM) study plan, with a button that opens that module and a fixed time slot. One tap to log it as done or skipped. Optional extras: pearl reviews and Anki (Me Deck and MGH only).
 - **Sessions**: the department's weekly teaching activities, with resident sessions (grand rounds, morning report, core curriculum, journal club) shown on Today and optional division teaching folded away.
 - **Schedule**: next 14 days and all 26 blocks of AY 2026-27. Tap a day to mark it on call, post-call, off, or pulled in.
 - **Study**: questions this week against the weekly target, the last 8 weeks, AMBOSS progress, history, and a JSON backup.
@@ -30,7 +30,7 @@ Live app (private, sign-in required): https://claude.ai/artifact/1fRAEuyTcWiVgte
 | Collection | Document id | Fields |
 |---|---|---|
 | `blocks` | block id (`6A`) | `start`, `end`, `code`, optional `label`, `hours`, `slot` |
-| `plan` | date (`2026-10-25`) | `topic`, `filter` (`Systems` or `Disciplines`), `count`, `kind` (`study`, `review`, `rest`), optional `slot`, `note`, `optional` |
+| `plan` | date (`2026-10-25`) | `topic` (an ABIM study plan module name), `filter` (`Module`; older rows `Systems` or `Disciplines`), `count`, `kind` (`study`, `review`, `rest`), optional `slot`, `note`, `optional` |
 | `log` | date | `status` (`done`, `skipped`), `questions`, `pct`, `topic`, `at` |
 | `days` | date | `type` (`auto`, `normal`, `call`, `postcall`, `off`, `pulled`), `rough` |
 | `extras` | date | `anki` |

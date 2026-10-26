@@ -480,6 +480,31 @@ td.topic-cell { white-space: normal; min-width: 140px; }
   const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
 
   const AMBOSS_URL = 'https://next.amboss.com/us/customsession';
+  // AMBOSS study plan "Internal Medicine (ABIM)": one module per ABIM blueprint area.
+  // Each module is a single long session; progress only counts questions answered inside it.
+  const AMBOSS_COURSE = 'https://next.amboss.com/us/courses/cG0ayh';
+  const MODULES = {
+    'Cardiovascular Disease': ['iRSJ5za', 'Cardiology'],
+    'Pulmonary Disease': ['QRSu5za', 'Pulmonology'],
+    'Infectious Disease': ['jRS_5za', 'Infectious disease'],
+    'Gastroenterology': ['PRSWMza', 'Gastroenterology'],
+    'Endocrinology, Diabetes, and Metabolism': ['4RS3Mza', 'Endocrinology'],
+    'Rheumatology and Orthopedics': ['kRSmMza', 'Rheumatology'],
+    'Hematology': ['ORSIMza', 'Hematology'],
+    'Medical Oncology': ['lRSvMza', 'Oncology'],
+    'Nephrology and Urology': ['NRS-Mza', 'Nephrology'],
+    'Neurology': ['mRSVnza', 'Neurology'],
+    'Psychiatry': ['5RSinza', 'Psychiatry'],
+    'Dermatology': ['MRSMnza', 'Dermatology'],
+    'Allergy and Immunology': ['nRS7nza', 'Allergy and immunology'],
+    'Otolaryngology and Dental Medicine': ['LRSwnza', 'ENT and dental medicine'],
+    'Obstetrics and Gynecology': ['oRS0Lza', 'Obstetrics and gynecology'],
+    'Ophthalmology': ['KRSULza', 'Ophthalmology'],
+    'Complex Medical Care': ['6RSjLza', 'Complex medical care'],
+    'Geriatric Syndromes': ['pRSLLza', 'Geriatrics'],
+    'Internal Medicine Assessment 1': ['JRSsLza', 'Assessment 1 (60 questions)'],
+    'Internal Medicine Assessment 2': ['qRSCLza', 'Assessment 2 (60 questions)'],
+  };
   const ICON_CLOCK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
   const ICON_CHECK = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5L20 7"/></svg>';
 
@@ -656,7 +681,21 @@ td.topic-cell { white-space: normal; min-width: 140px; }
   function topicTitle(st) {
     if (st.kind === 'review') return 'Review: your marked questions';
     if (!st.topic) return 'Any topic (none assigned yet)';
+    if (st.filter === 'Module' && MODULES[st.topic]) return MODULES[st.topic][1];
     return SPECIALTY[st.topic] || st.topic;
+  }
+  function isModule(st) { return st.kind !== 'review' && st.filter === 'Module' && !!MODULES[st.topic]; }
+  function ambossUrl(st) { return isModule(st) ? `${AMBOSS_COURSE}/${MODULES[st.topic][0]}` : AMBOSS_URL; }
+  function stepsHtml(st) {
+    if (isModule(st)) {
+      return `<li>Open AMBOSS below: it goes straight to the ${esc(st.topic)} module</li>
+        <li>Tap Resume (Study mode)</li>
+        <li>Answer ${st.count} questions, then close it. It keeps your place.</li>`;
+    }
+    return `<li>AMBOSS: Qbank, then Create a Qbank Session</li>
+        <li>${esc(filterLine(st))}</li>
+        ${st.kind === 'review' ? '' : '<li>Status: Not yet answered</li>'}
+        <li>Questions: ${st.count}, Study mode, then Start</li>`;
   }
 
   // ---------- writes ----------
@@ -776,19 +815,14 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       <div class="big"><span class="n">${st.count}</span> questions</div>
       <div class="topic">${esc(topicTitle(st))}</div>
       ${st.note ? `<p class="note">${esc(st.note)}</p>` : ''}
-      <ol class="steps">
-        <li>AMBOSS: Qbank, then Create a Qbank Session</li>
-        <li>${esc(filterLine(st))}</li>
-        ${st.kind === 'review' ? '' : '<li>Status: Not yet answered</li>'}
-        <li>Questions: ${st.count}, Study mode, then Start</li>
-      </ol>
+      <ol class="steps">${stepsHtml(st)}</ol>
       <div class="when">${ICON_CLOCK}<span>Best time: <strong>${esc(st.slot)}</strong></span></div>
       ${st.reason ? `<p class="reason">${esc(st.reason)}</p>` : ''}`;
     if (formOpen) {
       h += doneForm();
     } else {
       h += `<div class="actions">
-          <a class="btn primary" href="${AMBOSS_URL}" target="_blank" rel="noopener">Open AMBOSS</a>
+          <a class="btn primary" href="${esc(ambossUrl(st))}" target="_blank" rel="noopener">Open AMBOSS</a>
           <button class="btn" data-act="done-open" data-ds="${ds}">I'm done</button>
         </div>
         <div class="sub-actions">
