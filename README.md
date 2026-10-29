@@ -1,6 +1,6 @@
 # ResidentFlow
 
-A personal residency planner for one PGY1 internal medicine resident. It answers one question every day: what is my one study job today, given the rotation I am on?
+A personal residency planner for one PGY2 internal medicine resident. It answers one question every day: what is my one study job today, given the rotation I am on?
 
 Live app (private, sign-in required): https://claude.ai/artifact/1fRAEuyTcWiVgtevZq6jYr
 
