@@ -339,6 +339,13 @@ td.topic-cell { white-space: normal; min-width: 140px; }
 .pearl-meta a { font-weight: 700; }
 .pearl .actions { margin-top: 10px; }
 .pearl.retired .pearl-text { color: var(--muted); }
+.pearl-q { font-size: 13px; color: var(--muted); margin-bottom: 4px; overflow-wrap: anywhere; }
+.look .pearl-text { font-weight: 700; }
+.still { margin-top: 10px; padding: 10px 12px; border-radius: 10px; background: var(--warn-soft); font-size: 14px; }
+.still .actions { margin-top: 8px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 14px; padding: 4px; border-radius: 12px; background: var(--surface-2); }
+.seg button { appearance: none; border: 0; border-radius: 9px; background: none; color: var(--muted); font: inherit; font-size: 15px; font-weight: 700; padding: 10px 8px; min-height: 44px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--fg); box-shadow: var(--shadow); }
 
 /* sessions */
 .sess { display: grid; grid-template-columns: 88px 1fr; gap: 10px; padding: 12px 14px; }
@@ -449,7 +456,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     </button>
     <button class="tab" data-act="tab" data-view="pearls" id="tab-pearls">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z"/></svg>
-      Pearls
+      Learn
     </button>
   </div>
 </nav>
@@ -571,8 +578,9 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     sessions: {},
     settings: {},
     form: null, // { ds, q, pct }
-    sheet: null, // { kind: 'day', ds } | { kind: 'capture' }
-    cap: { text: '', area: 'Cardiology', link: '', phi: null },
+    sheet: null, // { kind: 'day', ds } | { kind: 'capture' } | { kind: 'learned', id }
+    cap: { kind: 'lookup', text: '', area: 'Cardiology', link: '', phi: null },
+    learned: { text: '', phi: null }, // the one-line takeaway when a look-up is done
     pearlQuery: '',
     confirmDel: null,
     showRetired: false,
@@ -645,8 +653,19 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     for (let i = 0; i < 7; i++) { const l = S.log[addDays(ws, i)]; if (l && l.status === 'done') t += num(l.questions, 0); }
     return t;
   }
+  // Captures are either pearls (reviewed at 3 days and 2 weeks, then retired)
+  // or look-ups (questions to read about; done turns them into a pearl).
+  const isLookup = (c) => c.kind === 'lookup';
   function pearlsDue(ds) {
-    return S.captures.filter((c) => c.status !== 'retired' && c.nextReview && c.nextReview <= ds);
+    return S.captures.filter((c) => !isLookup(c) && c.status !== 'retired' && c.nextReview && c.nextReview <= ds);
+  }
+  function openLookups() {
+    return S.captures.filter((c) => isLookup(c) && c.status === 'open').sort((a, b) => ((a.created || '') < (b.created || '') ? -1 : 1));
+  }
+  // Search AMBOSS for the topic part of the question: "ICI hepatitis: when to stop" searches "ICI hepatitis".
+  function ambossSearchUrl(text) {
+    const topic = String(text || '').split(/[:?]| - /)[0].trim().slice(0, 80) || String(text || '').trim().slice(0, 80);
+    return `https://next.amboss.com/us/search?q=${encodeURIComponent(topic)}&v=overview`;
   }
   function sessionsOn(ds) {
     return Object.entries(S.sessions)
@@ -763,10 +782,15 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     h += jobCard(ds, di, st);
     h += sessionsCard(ds, di);
 
-    // optional extras, at most two
+    // optional extras, at most two: one Learn row (a look-up on lighter days, pearls due) and Anki
     const due = pearlsDue(ds);
+    const light = !['night', 'call', 'postcall', 'pulled'].includes(di.type) && !di.rough;
+    const look = light ? openLookups()[0] : null;
     const opts = [];
-    if (due.length) {
+    if (look) {
+      const t = look.text.length > 70 ? look.text.slice(0, 68).trimEnd() + '…' : look.text;
+      opts.push(`<div class="opt"><div class="opt-body"><div class="opt-title">Look up: ${esc(t)}</div><div class="opt-sub">${due.length ? `Then ${plural(due.length, 'pearl')} to review. ` : ''}Optional.</div></div><button class="btn sm" data-act="tab" data-view="pearls">Open</button></div>`);
+    } else if (due.length) {
       opts.push(`<div class="opt"><div class="opt-body"><div class="opt-title">Review ${plural(due.length, 'pearl')}</div><div class="opt-sub">About a minute. Optional.</div></div><button class="btn sm" data-act="tab" data-view="pearls">Review</button></div>`);
     }
     if (di.type !== 'call' && di.type !== 'postcall') {
@@ -1040,30 +1064,49 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     }
   }
 
+  function lookupRow(c, ds) {
+    const link = safeUrl(c.link);
+    const stale = c.checkOn && c.checkOn <= ds;
+    const conf = S.confirmDel === c.id;
+    return `<div class="pearl look"><div class="pearl-text">${esc(c.text)}</div>
+      <div class="pearl-meta"><span>${esc(c.area || 'Other')}</span><span>Saved ${esc(c.created ? fmtDM(c.created) : '')}</span>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">Open link</a>` : ''}</div>
+      ${stale ? `<div class="still">Saved ${plural(daysBetween(c.created || ds, ds), 'day')} ago. Still want this?
+        <div class="actions"><button class="btn sm" data-act="look-keep" data-id="${esc(c.id)}">Keep it</button><button class="btn sm" data-act="look-drop" data-id="${esc(c.id)}">Drop it</button></div></div>` : ''}
+      <div class="actions"><a class="btn sm" href="${esc(ambossSearchUrl(c.text))}" target="_blank" rel="noopener">Search AMBOSS</a><button class="btn sm primary" data-act="look-done" data-id="${esc(c.id)}">Done</button></div>
+      <div class="sub-actions">${conf
+        ? `<span class="small">Delete for good?</span><button class="btn sm danger" data-act="pearl-del-yes" data-id="${esc(c.id)}">Delete</button><button class="link quiet" data-act="pearl-del-no">Keep</button>`
+        : `<button class="link quiet" data-act="pearl-del" data-id="${esc(c.id)}">Delete</button>`}</div></div>`;
+  }
+
   function viewPearls(ds) {
     const due = pearlsDue(ds);
+    const looks = openLookups();
     let h = '';
+    h += `<div class="sec-h" style="margin-top:6px"><h2>To look up</h2><span class="small muted">${looks.length || ''}</span></div><section class="card list-card">`;
+    h += looks.length ? looks.map((c) => lookupRow(c, ds)).join('') : '<div class="empty">Nothing to look up. Saw something on rounds you want to read about? Tap Capture and choose Look up.</div>';
+    h += '</section>';
     if (due.length) {
-      h += `<div class="sec-h" style="margin-top:6px"><h2>Due for review</h2><span class="small muted">${due.length}</span></div><section class="card list-card">`;
+      h += `<div class="sec-h"><h2>Due for review</h2><span class="small muted">${due.length}</span></div><section class="card list-card">`;
       for (const c of due) {
-        h += `<div class="pearl"><div class="pearl-text">${esc(c.text)}</div>${pearlMeta(c)}
+        h += `<div class="pearl">${pearlQ(c)}<div class="pearl-text">${esc(c.text)}</div>${pearlMeta(c)}
           <div class="actions"><button class="btn sm primary" data-act="pearl-ok" data-id="${esc(c.id)}">I remembered it</button><button class="btn sm" data-act="pearl-again" data-id="${esc(c.id)}">Show again tomorrow</button></div></div>`;
       }
       h += '</section>';
     }
     const q = S.pearlQuery.trim().toLowerCase();
-    const list = S.captures.filter((c) => (S.showRetired || c.status !== 'retired') && (!q || (c.text || '').toLowerCase().includes(q) || (c.area || '').toLowerCase().includes(q)));
-    h += `<div class="sec-h"${due.length ? '' : ' style="margin-top:6px"'}><h2>All pearls</h2><span class="small muted">${S.captures.filter((c) => c.status !== 'retired').length} active</span></div>
+    const pearls = S.captures.filter((c) => !isLookup(c));
+    const list = pearls.filter((c) => (S.showRetired || c.status !== 'retired') && (!q || [c.text, c.area, c.q].some((x) => (x || '').toLowerCase().includes(q))));
+    h += `<div class="sec-h"><h2>All pearls</h2><span class="small muted">${pearls.filter((c) => c.status !== 'retired').length} active</span></div>
       <label for="p-q" class="faint" style="font-weight:400">Search</label>
       <input id="p-q" type="search" placeholder="Search text or area" value="${esc(S.pearlQuery)}" autocomplete="off">
       <div class="sub-actions"><button class="link quiet" data-act="toggle-retired">${S.showRetired ? 'Hide' : 'Show'} retired pearls</button></div>
       <section class="card list-card" style="margin-top:6px">`;
     if (!list.length) {
-      h += `<div class="empty">${S.captures.length ? 'Nothing matches.' : 'No pearls yet. Tap Capture to save one line from today. You will see it again in 3 days and in 2 weeks.'}</div>`;
+      h += `<div class="empty">${pearls.length ? 'Nothing matches.' : 'No pearls yet. Tap Capture to save one line from today, or finish a look-up. You will see it again in 3 days and in 2 weeks.'}</div>`;
     }
     for (const c of list) {
       const conf = S.confirmDel === c.id;
-      h += `<div class="pearl${c.status === 'retired' ? ' retired' : ''}"><div class="pearl-text">${esc(c.text)}</div>${pearlMeta(c)}
+      h += `<div class="pearl${c.status === 'retired' ? ' retired' : ''}">${pearlQ(c)}<div class="pearl-text">${esc(c.text)}</div>${pearlMeta(c)}
         <div class="sub-actions">${conf
           ? `<span class="small">Delete for good?</span><button class="btn sm danger" data-act="pearl-del-yes" data-id="${esc(c.id)}">Delete</button><button class="link quiet" data-act="pearl-del-no">Keep</button>`
           : `<button class="link quiet" data-act="pearl-del" data-id="${esc(c.id)}">Delete</button>`}</div></div>`;
@@ -1078,6 +1121,8 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     else if (c.nextReview) when = `Next review ${fmtDM(c.nextReview)}`;
     return `<div class="pearl-meta"><span>${esc(c.area || 'Other')}</span><span>Saved ${esc(c.created ? fmtDM(c.created) : '')}</span><span>${esc(when)}</span>${link ? `<a href="${esc(link)}" target="_blank" rel="noopener">Open link</a>` : ''}</div>`;
   }
+  // a pearl that came from a look-up shows its question above it
+  const pearlQ = (c) => (c.q ? `<div class="pearl-q">Looked up: ${esc(c.q)}</div>` : '');
 
   // ---------- sheets ----------
   function openSheet(sheet) {
@@ -1099,7 +1144,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     if (!S.sheet) { el.hidden = true; return; }
     el.className = 'sheet';
     el.hidden = false;
-    el.innerHTML = S.sheet.kind === 'day' ? daySheet(S.sheet.ds) : captureSheet();
+    el.innerHTML = S.sheet.kind === 'day' ? daySheet(S.sheet.ds) : S.sheet.kind === 'learned' ? learnedSheet(S.sheet.id) : captureSheet();
   }
   function daySheet(ds) {
     const di = dayInfo(ds);
@@ -1131,12 +1176,17 @@ td.topic-cell { white-space: normal; min-width: 140px; }
   }
   function captureSheet() {
     const c = S.cap;
+    const look = c.kind === 'lookup';
     const areas = AREAS.map((a) => `<option${a === c.area ? ' selected' : ''}>${esc(a)}</option>`).join('');
     return `<div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
       <h2 id="sheet-title">Quick capture</h2>
-      <p class="hint">One line you want to remember. Never a name, record number, birth date, or bed number. Details go in OneNote.</p>
-      <label for="c-text">Pearl</label>
-      <textarea id="c-text" maxlength="280" rows="3" placeholder="e.g. Hold metformin 48 h after iodinated contrast if eGFR under 30" data-autofocus>${esc(c.text)}</textarea>
+      <div class="seg" role="group" aria-label="What is it">
+        <button data-act="cap-kind" data-kind="lookup" aria-pressed="${look}">Look up later</button>
+        <button data-act="cap-kind" data-kind="pearl" aria-pressed="${!look}">Pearl</button>
+      </div>
+      <p class="hint">${look ? 'A question to read about later. It waits in Learn with a Search AMBOSS button.' : 'Something you learned, in one line. You will see it again in 3 days and in 2 weeks.'} Never a name, record number, birth date, or bed number. Details go in OneNote.</p>
+      <label for="c-text">${look ? 'Question' : 'Pearl'}</label>
+      <textarea id="c-text" maxlength="280" rows="3" placeholder="${look ? 'e.g. ICI hepatitis: grading, and when to stop the drug' : 'e.g. Hold metformin 48 h after iodinated contrast if eGFR under 30'}" data-autofocus>${esc(c.text)}</textarea>
       <div class="counter" id="c-count">${c.text.length}/280</div>
       <label for="c-area">Area</label>
       <select id="c-area">${areas}</select>
@@ -1144,9 +1194,28 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       <input id="c-link" type="url" inputmode="url" placeholder="https://" value="${esc(c.link)}" autocomplete="off">
       ${c.phi ? `<div class="phi"><strong>This might identify a patient:</strong> it contains ${esc(c.phi.join(', '))}. Remove it, or save only if you are sure it is not patient information.</div>` : ''}
       <div class="actions">
-        <button class="btn primary" data-act="cap-save">${c.phi ? 'Save anyway' : 'Save pearl'}</button>
+        <button class="btn primary" data-act="cap-save">${c.phi ? 'Save anyway' : look ? 'Save look-up' : 'Save pearl'}</button>
         <button class="btn ghost" data-act="sheet-close">Cancel</button>
       </div>
+    </div>`;
+  }
+  function learnedSheet(id) {
+    const c = S.captures.find((x) => x.id === id);
+    if (!c) return '<div class="sheet-in"><p class="hint">This look-up is gone.</p><div class="actions"><button class="btn ghost" data-act="sheet-close">Close</button></div></div>';
+    const l = S.learned;
+    return `<div class="sheet-in" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+      <h2 id="sheet-title">What did you learn?</h2>
+      <p class="hint">You looked up: ${esc(c.text)}</p>
+      <label for="l-text">One line to keep</label>
+      <textarea id="l-text" maxlength="280" rows="3" placeholder="The one thing you want to remember" data-autofocus>${esc(l.text)}</textarea>
+      <div class="counter" id="l-count">${l.text.length}/280</div>
+      ${l.phi ? `<div class="phi"><strong>This might identify a patient:</strong> it contains ${esc(l.phi.join(', '))}. Remove it, or save only if you are sure it is not patient information.</div>` : ''}
+      <p class="hint">It becomes a pearl, and you will see it again in 3 days and in 2 weeks.</p>
+      <div class="actions">
+        <button class="btn primary" data-act="learn-save" data-id="${esc(c.id)}">${l.phi ? 'Save anyway' : 'Save as pearl'}</button>
+        <button class="btn ghost" data-act="sheet-close">Cancel</button>
+      </div>
+      <div class="sub-actions"><button class="link quiet" data-act="learn-skip" data-id="${esc(c.id)}">Done, nothing to keep</button></div>
     </div>`;
   }
   const PHI = [
@@ -1247,6 +1316,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     'pearl-del-no'() { S.confirmDel = null; render(); },
     async 'pearl-del-yes'(el) { const ok = await write(() => docRef('captures', el.dataset.id).delete(), 'Deleted.'); if (ok) { S.confirmDel = null; render(); } },
     'toggle-retired'() { S.showRetired = !S.showRetired; render(); },
+    'cap-kind'(el) { S.cap.kind = el.dataset.kind; S.cap.phi = null; renderSheet(); const t = $('#c-text'); if (t) t.focus(); },
     async 'cap-save'() {
       const c = S.cap;
       const text = c.text.trim();
@@ -1257,9 +1327,33 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       const link = c.link.trim();
       if (link && !safeUrl(link)) { toast('The link should start with https:// or onenote:'); return; }
       const ds = todayStr();
-      const ok = await write(() => db.collection('captures').add({ text, area: c.area, link: link || null, created: ds, stage: 0, nextReview: addDays(ds, 3), status: 'active' }), 'Saved. You will see it again in 3 days.');
-      if (ok) { S.cap = { text: '', area: c.area, link: '', phi: null }; closeSheet(); }
+      const look = c.kind === 'lookup';
+      const doc = look
+        ? { kind: 'lookup', text, area: c.area, link: link || null, created: ds, checkOn: addDays(ds, 14), status: 'open' }
+        : { kind: 'pearl', text, area: c.area, link: link || null, created: ds, stage: 0, nextReview: addDays(ds, 3), status: 'active' };
+      const ok = await write(() => db.collection('captures').add(doc), look ? 'Saved to your look-up list.' : 'Saved. You will see it again in 3 days.');
+      if (ok) { S.cap = { kind: c.kind, text: '', area: c.area, link: '', phi: null }; closeSheet(); }
     },
+    'look-done'(el) { S.learned = { text: '', phi: null }; openSheet({ kind: 'learned', id: el.dataset.id }); },
+    async 'learn-save'(el) {
+      const c = S.captures.find((x) => x.id === el.dataset.id); if (!c) return;
+      const l = S.learned;
+      const text = l.text.trim();
+      if (!text) { toast('Write one line first, or tap Done, nothing to keep.'); return; }
+      const hits = phiHits(text);
+      const sameWarning = l.phi && hits.join() === l.phi.join();
+      if (hits.length && !sameWarning) { l.phi = hits; renderSheet(); return; }
+      const ds = todayStr();
+      const patch = { kind: 'pearl', q: c.text, text, learnedOn: ds, stage: 0, nextReview: addDays(ds, 3), status: 'active', checkOn: null };
+      const ok = await write(() => docRef('captures', c.id).update(patch), 'Saved as a pearl. You will see it again in 3 days.');
+      if (ok) { S.learned = { text: '', phi: null }; closeSheet(); }
+    },
+    async 'learn-skip'(el) {
+      const ok = await write(() => docRef('captures', el.dataset.id).update({ status: 'done', doneOn: todayStr() }), 'Done. Off your list.');
+      if (ok) closeSheet();
+    },
+    async 'look-keep'(el) { await write(() => docRef('captures', el.dataset.id).update({ checkOn: addDays(todayStr(), 14) }), 'Kept. It will ask again in 2 weeks.'); },
+    async 'look-drop'(el) { await write(() => docRef('captures', el.dataset.id).update({ status: 'dropped', droppedOn: todayStr() }), 'Dropped.'); },
     chart(el) {
       S.chartSel = el.dataset.w;
       document.querySelectorAll('#chart8 .hit').forEach((h) => h.classList.toggle('on', h === el));
@@ -1291,6 +1385,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     if (t.id === 'f-q' && S.form) S.form.q = t.value;
     else if (t.id === 'f-pct' && S.form) S.form.pct = t.value;
     else if (t.id === 'c-text') { S.cap.text = t.value; const n = $('#c-count'); if (n) n.textContent = `${t.value.length}/280`; }
+    else if (t.id === 'l-text') { S.learned.text = t.value; const n = $('#l-count'); if (n) n.textContent = `${t.value.length}/280`; }
     else if (t.id === 'c-link') S.cap.link = t.value;
     else if (t.id === 'c-area') S.cap.area = t.value;
     else if (t.id === 'p-q') {

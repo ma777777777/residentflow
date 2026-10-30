@@ -10,7 +10,7 @@ Live app (private, sign-in required): https://claude.ai/artifact/1fRAEuyTcWiVgte
 - **Sessions**: the department's weekly teaching activities, with resident sessions (grand rounds, morning report, core curriculum, journal club) shown on Today and optional division teaching folded away.
 - **Schedule**: next 14 days and all 26 blocks of AY 2026-27. Tap a day to mark it on call, post-call, off, or pulled in.
 - **Study**: questions this week against the weekly target, the last 8 weeks, AMBOSS progress, history, and a JSON backup.
-- **Pearls**: one-line clinical pearls with a patient-information check, reviewed at 3 days and 2 weeks, then retired. Detailed notes stay in OneNote.
+- **Learn**: one-line captures with a patient-information check. A *look-up* is a question to read about later (for example from a case on rounds): it waits with a Search AMBOSS button, shows on Today on lighter days (never on call, post-call or night days), asks "still want this?" after 2 weeks, and when done its one-line takeaway becomes a pearl. A *pearl* is something learned, reviewed at 3 days and 2 weeks, then retired. Detailed notes stay in OneNote.
 
 ## Rules the app follows
 
@@ -34,7 +34,7 @@ Live app (private, sign-in required): https://claude.ai/artifact/1fRAEuyTcWiVgte
 | `log` | date | `status` (`done`, `skipped`), `questions`, `pct`, `topic`, `at` |
 | `days` | date | `type` (`auto`, `normal`, `call`, `postcall`, `off`, `pulled`), `rough` |
 | `extras` | date | `anki` |
-| `captures` | auto id | `text`, `area`, `link`, `created`, `stage`, `nextReview`, `status` (`active`, `retired`) |
+| `captures` | auto id | `kind` (`lookup`, `pearl`; missing means `pearl`), `text`, `area`, `link`, `created`. Look-ups: `checkOn`, `status` (`open`, `done`, `dropped`). Pearls: `stage`, `nextReview`, `status` (`active`, `retired`), optional `q` (the look-up it came from) and `learnedOn` |
 | `sessions` | date and slug (`2026-10-27-grand-rounds`) | `date`, `start`, `end` (24 h `HH:MM`), `title`, `topic`, `place`, `kind` (`core` for resident sessions, `optional` for division teaching), `source` |
 | `settings` | `main` | `weeklyTarget`, `minDay`, `examLabel`, `examMonth`, `amboss` {`answered`, `total`, `pct`, `epc`, `percentile`, `asOf`} |
 
