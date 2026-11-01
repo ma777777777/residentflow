@@ -662,9 +662,9 @@ td.topic-cell { white-space: normal; min-width: 140px; }
   function openLookups() {
     return S.captures.filter((c) => isLookup(c) && c.status === 'open').sort((a, b) => ((a.created || '') < (b.created || '') ? -1 : 1));
   }
-  // Search AMBOSS for the topic part of the question: "ICI hepatitis: when to stop" searches "ICI hepatitis".
+  // Search AMBOSS for the topic part of the question: "ICI hepatitis: when to stop" or a first line searches "ICI hepatitis".
   function ambossSearchUrl(text) {
-    const topic = String(text || '').split(/[:?]| - /)[0].trim().slice(0, 80) || String(text || '').trim().slice(0, 80);
+    const topic = String(text || '').split(/[:?\n]| - /)[0].trim().slice(0, 80) || String(text || '').trim().slice(0, 80);
     return `https://next.amboss.com/us/search?q=${encodeURIComponent(topic)}&v=overview`;
   }
   function sessionsOn(ds) {
