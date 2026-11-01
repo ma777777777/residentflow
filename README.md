@@ -36,7 +36,7 @@ Live app (private, sign-in required): https://claude.ai/artifact/1fRAEuyTcWiVgte
 | `extras` | date | `anki` |
 | `captures` | auto id | `kind` (`lookup`, `pearl`; missing means `pearl`), `text`, `area`, `link`, `created`. Look-ups: `checkOn`, `status` (`open`, `done`, `dropped`). Pearls: `stage`, `nextReview`, `status` (`active`, `retired`), optional `q` (the look-up it came from) and `learnedOn` |
 | `sessions` | date and slug (`2026-10-27-grand-rounds`) | `date`, `start`, `end` (24 h `HH:MM`), `title`, `topic`, `place`, `kind` (`core` for resident sessions, `optional` for division teaching), `source` |
-| `settings` | `main` | `weeklyTarget`, `minDay`, `examLabel`, `examMonth`, `amboss` {`answered`, `total`, `pct`, `epc`, `percentile`, `asOf`} |
+| `settings` | `main` | `weeklyTarget`, `minDay`, `examLabel`, `examMonth`, `amboss` {`answered`, `total`, `pct`, `epc`, `percentile`, `asOf` (date checked), `checkedAt` (UTC time checked; logs saved on that day after it are added on top)} |
 
 ## Changing the app
 

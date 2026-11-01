@@ -982,7 +982,12 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     let amb = '';
     if (a && a.total) {
       let since = 0;
-      for (const [d, l] of Object.entries(S.log)) if (d >= a.asOf && l.status === 'done') since += num(l.questions, 0);
+      // Logs after the check day count; on the check day itself, only logs saved after the check (checkedAt) do.
+      for (const [d, l] of Object.entries(S.log)) {
+        if (l.status !== 'done' || d < a.asOf) continue;
+        if (d === a.asOf && a.checkedAt && l.at && l.at <= a.checkedAt) continue;
+        since += num(l.questions, 0);
+      }
       const est = Math.min(a.total, num(a.answered, 0) + since);
       const p = Math.round((est / a.total) * 100);
       amb = `<div class="sec-h"><h2>AMBOSS ABIM Qbank</h2><span class="small muted">checked ${esc(fmtDM(a.asOf))}</span></div>
