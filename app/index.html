@@ -543,39 +543,114 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     pulled: { label: 'Pulled in', tone: 't-warn' },
   };
   // ---------- ECG track ----------
-  // Medmastery ECG Mastery (Yellow then Blue Belt), one level per session, each followed by
-  // ECGs read before looking at the answer. Plan, phases and weekly focus live in settings/ecg.
+  // Medmastery ECG Mastery, from his own downloaded copy (OneDrive Desktop > medmastery).
+  // Blue Belt (older 10-level version) is a refresher: quiz first, video only if missed.
+  // Black Belt Workshop is 68 cases: part 1 shows the ECG, pause and write a read, then the rest explains.
+  // Plan, phases and weekly focus live in settings/ecg.
   const ECG_COURSES = {
-    yellow: { name: 'Yellow Belt', url: 'https://www.medmastery.com/course/ecg-mastery-yellow-belt' },
-    blue: { name: 'Blue Belt', url: 'https://www.medmastery.com/course/ecg-mastery-blue-belt' },
+    yellow: { name: 'Yellow Belt', unit: 'level', where: 'Desktop > medmastery > ECG Mastery Yellow Belt' },
+    blue: { name: 'Blue Belt', unit: 'level', where: 'Desktop > medmastery > ECG Mastery Blue Belt' },
+    black: { name: 'Black Belt', unit: 'case', where: 'Desktop > medmastery > ECG Mastery Black Belt Workshop', batch: 3 },
   };
-  // [id, course, level title, minutes of video, practice search term]
+  // [id, course, title, practice search term]
+  const BLACK_CASES = [
+    "Chest pain & hypertension in a 52-year-old",
+    "Resistant hypertension in a 64-year-old man",
+    "Severe chest pain in a 42-year-old man",
+    "Shortness of breath and dilated neck veins",
+    "Anticoagulation and precordial pressure",
+    "Progressive dyspnea and hypertension",
+    "Precordial pain and dyspnea",
+    "Hyperthyroidism and atrial fibrillation",
+    "Recurring chest pain",
+    "Nausea, abdominal pain, and dizziness",
+    "Chest and upper abdominal pain",
+    "Severe chest pain in a 56-year-old man",
+    "Woman, 82, with an attack of dizziness",
+    "Woman, 66, with worsening exertional dyspnea",
+    "71-year-old woman at routine checkup",
+    "22-year-old man with fatigue",
+    "Man, 29, with chest pain and negative troponin",
+    "40-year-old man with hypertension",
+    "63-year-old woman in outpatient clinic",
+    "Exertional breathlessness in a 73-year-old man",
+    "25-year-old man with chest pain",
+    "Collapse at home",
+    "81-year-old woman with severe chest pain",
+    "Routine ECG in a healthy 24-year-old man",
+    "Man, 22, with regular palpitations",
+    "Breathlessness in a 79-year-old woman",
+    "Woman, 86, with dizziness and breathlessness",
+    "77-year-old woman with pre-syncope",
+    "Exertional breathlessness and orthopnoea",
+    "Breathlessness and peripheral oedema",
+    "A serendipitous finding",
+    "Routine ECG after heart surgery",
+    "VVI pacemaker and dizziness",
+    "Ischaemic heart disease and collapse",
+    "Vomiting, diarrhoea, and abnormal electrolytes",
+    "Haematemesis and melaena",
+    "Pre-operative assessment",
+    "75-year-old man with syncope",
+    "Morning papers and dizziness",
+    "Man, 36, with viral myocarditis",
+    "Shortness of breath after hip replacement",
+    "Sudden onset palpitations",
+    "78-year-old man, routine check-up findings",
+    "Man, 56, with irregular heartbeat",
+    "Male, 72, with weak heart",
+    "Male, 56, with severe precordial pain",
+    "Worried woman",
+    "A routine check-up's findings",
+    "Two episodes of syncope",
+    "Dyspnea, nausea, and loss of appetite",
+    "Woman, 76, with ischaemic heart disease",
+    "Hypertension and acute chest pain",
+    "84-year-old man, breathlessness",
+    "An interrupted game of chess",
+    "The findings of a routine ECG",
+    "Healthy 24-year-old male",
+    "A Holter monitor finding",
+    "Active woman after thyroidectomy",
+    "Young man, collapse at home",
+    "Dizziness and syncope",
+    "Woman with episodic palpitations",
+    "Metastatic bronchoalveolar carcinoma",
+    "Right-sided chest leads",
+    "Right treatment",
+    "Hypertension and chest pain",
+    "Woman with weakness and dizziness",
+    "Rapid heart and palpitations",
+    "Severe precordial pain"
+  ];
   const ECG_LESSONS = [
-    ['Y1', 'yellow', 'The ECG curve', 13, 'ECG basics'],
-    ['Y2', 'yellow', 'Measurements', 6, 'ECG intervals'],
-    ['Y3', 'yellow', 'Interpretation of durations', 7, 'bundle branch block'],
-    ['Y4', 'yellow', 'The precordial leads', 16, 'R wave progression'],
-    ['Y5', 'yellow', 'The precordial leads, advanced', 8, 'R wave progression'],
-    ['Y6', 'yellow', 'Ventricular hypertrophy', 8, 'left ventricular hypertrophy'],
-    ['Y7', 'yellow', 'ST patterns', 7, 'ST depression'],
-    ['Y8', 'yellow', 'Introduction to myocardial infarction', 20, 'anterior STEMI'],
-    ['Y9', 'yellow', 'Inferior wall MI', 12, 'inferior STEMI'],
-    ['Y10', 'yellow', 'Mastering the ST segment', 16, 'myocardial ischaemia'],
-    ['Y11', 'yellow', 'Axis, atrial hypertrophy, low voltage', 22, 'ECG axis'],
-    ['Y12', 'yellow', 'Electrolyte imbalances', 9, 'hyperkalaemia'],
-    ['Y13', 'yellow', 'Normal sinus rhythm', 4, 'sinus rhythm'],
-    ['B1', 'blue', 'Normal sinus rhythm, regular or irregular', 7, 'sinus arrhythmia'],
-    ['B2', 'blue', 'Life-threatening rhythms', 6, 'ventricular tachycardia'],
-    ['B3', 'blue', 'Rapid, regular, broad rhythms', 7, 'broad complex tachycardia'],
-    ['B4', 'blue', 'Rapid, regular, narrow rhythms', 14, 'SVT'],
-    ['B5', 'blue', 'Abnormal P waves: junctional rhythm, AF', 15, 'junctional rhythm'],
-    ['B6', 'blue', 'Excess P waves', 8, 'atrial flutter'],
-    ['B7', 'blue', 'High-degree AV blocks', 16, 'AV block'],
-    ['B8', 'blue', 'The basic rhythm and its interruptions', 5, 'premature beats'],
-    ['B9', 'blue', 'Unexpected beats', 16, 'ectopic beats'],
-    ['B10', 'blue', 'Pauses and AV dissociation', 21, 'AV dissociation'],
-    ['B11', 'blue', 'Pacemakers', 16, 'pacemaker ECG'],
-  ].map(([id, course, title, min, q]) => ({ id, course, title, min, q }));
+    ['Y1', 'yellow', 'The ECG curve', 'ECG basics'],
+    ['Y2', 'yellow', 'Measurements', 'ECG intervals'],
+    ['Y3', 'yellow', 'Interpretation of durations', 'bundle branch block'],
+    ['Y4', 'yellow', 'The precordial leads', 'R wave progression'],
+    ['Y5', 'yellow', 'The precordial leads, advanced', 'R wave progression'],
+    ['Y6', 'yellow', 'Ventricular hypertrophy', 'left ventricular hypertrophy'],
+    ['Y7', 'yellow', 'ST patterns', 'ST depression'],
+    ['Y8', 'yellow', 'Introduction to myocardial infarction', 'anterior STEMI'],
+    ['Y9', 'yellow', 'Inferior wall MI', 'inferior STEMI'],
+    ['Y10', 'yellow', 'Mastering the ST segment', 'myocardial ischaemia'],
+    ['Y11', 'yellow', 'Axis, atrial hypertrophy, low voltage', 'ECG axis'],
+    ['Y12', 'yellow', 'Electrolyte imbalances', 'hyperkalaemia'],
+    ['Y13', 'yellow', 'Normal sinus rhythm', 'sinus rhythm'],
+    ['B1', 'blue', 'Rhythms at a glance', 'ventricular tachycardia'],
+    ['B2', 'blue', 'Rapid, regular and broad', 'broad complex tachycardia'],
+    ['B3', 'blue', 'Rapid, regular and narrow', 'SVT'],
+    ['B4', 'blue', 'The P waves are not normal', 'junctional rhythm'],
+    ['B5', 'blue', 'Too many P waves', 'atrial flutter'],
+    ['B6', 'blue', 'High-degree AV blocks', 'AV block'],
+    ['B7', 'blue', 'The basic rhythm and its interruptions', 'premature beats'],
+    ['B8', 'blue', 'Unexpected beats', 'ectopic beats'],
+    ['B9', 'blue', 'Pauses, Rhythm Cheat Sheet, AV dissociation', 'AV dissociation'],
+    ['B10', 'blue', 'Pacemakers', 'pacemaker ECG'],
+    ...BLACK_CASES.map((t, i) => ['K' + (i + 1), 'black', t, null]),
+  ].map(([id, course, title, q]) => ({ id, course, title, q }));
+  // "Blue Belt level 4" or "Black Belt case 12"
+  const ecgLabel = (l) => `${ECG_COURSES[l.course].name} ${ECG_COURSES[l.course].unit} ${l.id.slice(1)}`;
   const ECG_LINKS = {
     library: 'https://litfl.com/ecg-library/',
     top150: 'https://litfl.com/top-100/ecg',
@@ -765,6 +840,15 @@ td.topic-cell { white-space: normal; min-width: 140px; }
   }
   function ecgDone() { return (S.ecg.done && typeof S.ecg.done === 'object') ? S.ecg.done : {}; }
   function ecgNext() { const d = ecgDone(); return ecgOwned().find((l) => !d[l.id]) || null; }
+  // What one session covers: one level, or the next few Black Belt cases.
+  function ecgBatch() {
+    const nx = ecgNext();
+    if (!nx) return [];
+    const n = ECG_COURSES[nx.course].batch || 1;
+    const d = ecgDone();
+    return ecgOwned().filter((l) => l.course === nx.course && !d[l.id]).slice(0, n);
+  }
+  const ecgIds = (e) => (e ? (Array.isArray(e.lessons) ? e.lessons : (e.lesson ? [e.lesson] : [])) : []);
   function ecgPhase(ds) {
     const ph = Array.isArray(S.ecg.phases) ? S.ecg.phases : [];
     return ph.find((p) => p.from <= ds && ds <= p.to) || null;
@@ -796,7 +880,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     }
     return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 3);
   }
-  const ecgPracticeUrl = (l) => (l ? `https://litfl.com/?s=${encodeURIComponent(l.q)}` : ECG_LINKS.top150);
+  const ecgPracticeUrl = (l) => (l && l.q ? `https://litfl.com/?s=${encodeURIComponent(l.q)}` : ECG_LINKS.top150);
   // ECG is a bonus: it shows once today's questions are done (or on a day off), never on
   // call, post-call, night, pulled-in or rough days.
   function ecgShowsToday(ds, di, st) {
@@ -813,18 +897,26 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     const focus = S.ecg.focus ? `<p class="note">This week's focus: <strong>${esc(S.ecg.focus)}</strong></p>` : '';
     let h = '<div class="sec-h"><h2>ECG bonus</h2></div><section class="card">';
     if (e && !formOpen) {
-      const lt = e.lesson ? ECG_LESSONS.find((x) => x.id === e.lesson) : null;
+      const ls = ecgIds(e).map((id) => ECG_LESSONS.find((x) => x.id === id)).filter(Boolean);
+      const what = !ls.length ? '' : ls.length === 1 ? `${ecgLabel(ls[0])}: ${ls[0].title}. ` : `${ECG_COURSES[ls[0].course].name} cases ${ls[0].id.slice(1)} to ${ls[ls.length - 1].id.slice(1)}. `;
       h += `<div class="eyebrow" style="color:var(--off)">ECG done today</div>
-        <p class="note">${lt ? `${esc(ECG_COURSES[lt.course].name)} level ${esc(lt.id.slice(1))}: ${esc(lt.title)}. ` : ''}${plural(num(e.read, 0), 'ECG')} read${e.read ? `, ${num(e.right, 0)} right on the first read` : ''}.</p>
+        <p class="note">${esc(what)}${plural(num(e.read, 0), 'ECG')} read${e.read ? `, ${num(e.right, 0)} right on the first read` : ''}.</p>
         <p class="tip">Missed something? Capture it as a pearl, area ECG, written "Topic: what I missed".</p>
         <div class="sub-actions"><button class="link quiet" data-act="ecg-open" data-ds="${ds}">Edit</button><button class="link quiet" data-act="ecg-undo" data-ds="${ds}">Undo</button></div>`;
       return h + '</section>';
     }
-    if (nx) {
+    const batch = ecgBatch();
+    const where = nx ? `<p class="tip">On your PC, or in the OneDrive app on your phone: ${esc(ECG_COURSES[nx.course].where)}.</p>` : '';
+    if (nx && ECG_COURSES[nx.course].unit === 'case') {
       h += `<div class="eyebrow">Bonus, about 20 minutes</div>
-        <div class="topic">${esc(ECG_COURSES[nx.course].name)} level ${esc(nx.id.slice(1))}: ${esc(nx.title)}</div>
-        <p class="note">${ecgRefresh(nx) ? `Refresher: quiz first, then the ${nx.min} min video only if you missed something.` : `${nx.min} min of video, then its quiz.`}</p>${focus}
-        <ol class="steps"><li>${ecgRefresh(nx) ? 'Take the level quiz first. Missed any? Watch the video' : 'Watch the level and pass its quiz'}</li><li>Read 2 or 3 ECGs on it: write your read before you look at the answer</li><li>Anything you missed: Capture a pearl, area ECG</li></ol>`;
+        <div class="topic">${esc(ECG_COURSES[nx.course].name)} ${batch.length > 1 ? `cases ${esc(batch[0].id.slice(1))} to ${esc(batch[batch.length - 1].id.slice(1))}` : `case ${esc(nx.id.slice(1))}`}</div>
+        <p class="note">${batch.map((l) => esc(l.title)).join(' &middot; ')}</p>${focus}
+        <ol class="steps"><li>Play part 1 of a case and pause on the ECG</li><li>Write your full read and one-line diagnosis before you play on</li><li>Wrong or missed something? Capture a pearl, area ECG</li></ol>${where}`;
+    } else if (nx) {
+      h += `<div class="eyebrow">Bonus, about 20 minutes</div>
+        <div class="topic">${esc(ecgLabel(nx))}: ${esc(nx.title)}</div>
+        <p class="note">${ecgRefresh(nx) ? 'Refresher: do the level quiz first (the Quiz PDF and quiz videos) and watch the main video only if you missed something.' : 'Watch the level, then its quiz.'}</p>${focus}
+        <ol class="steps"><li>${ecgRefresh(nx) ? 'Quiz first. Missed any? Watch the main video' : 'Watch the level and do its quiz'}</li><li>Read 2 or 3 ECGs on it: write your read before you look at the answer</li><li>Anything you missed: Capture a pearl, area ECG</li></ol>${where}`;
     } else {
       h += `<div class="eyebrow">Bonus, about 15 minutes</div>
         <div class="topic">Read 3 unseen ECGs</div>${focus}
@@ -834,19 +926,29 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       h += ecgForm();
     } else {
       h += `<div class="actions">
-          ${nx ? `<a class="btn primary" href="${esc(ECG_COURSES[nx.course].url)}" target="_blank" rel="noopener">Medmastery</a>` : ''}
-          <a class="btn${nx ? '' : ' primary'}" href="${esc(nx ? ecgPracticeUrl(nx) : ECG_LINKS.top150)}" target="_blank" rel="noopener">Practice ECGs</a>
+          <button class="btn primary" data-act="ecg-open" data-ds="${ds}">Log it</button>
+          <a class="btn" href="${esc(ecgPracticeUrl(nx))}" target="_blank" rel="noopener">${nx && nx.q ? 'Practice ECGs' : 'LITFL ECGs'}</a>
         </div>
-        <div class="sub-actions"><button class="link" data-act="ecg-open" data-ds="${ds}">Log it</button><span class="small muted">Only 5 minutes? Just read 2 ECGs and log those.</span></div>`;
+        <div class="sub-actions"><span class="small muted">Only 5 minutes? Just read 2 ECGs and log those.</span></div>`;
     }
     return h + '</section>';
   }
   function ecgForm() {
     const f = S.ecgForm;
-    const nx = ecgNext();
-    const lt = f.lessonId ? ECG_LESSONS.find((x) => x.id === f.lessonId) : nx;
+    const ls = f.ids.map((id) => ECG_LESSONS.find((x) => x.id === id)).filter(Boolean);
+    let pick = '';
+    if (ls.length === 1) {
+      pick = `<button class="btn" style="width:100%;justify-content:flex-start" data-act="ecg-lesson" aria-pressed="${f.n > 0}">${f.n > 0 ? '&#10003; ' : ''}Finished ${esc(ecgLabel(ls[0]))}${ls[0].course === 'black' ? '' : ' and its quiz'}</button>`;
+    } else if (ls.length > 1) {
+      pick = `<label for="e-n">${esc(ECG_COURSES[ls[0].course].name)} cases finished <span class="faint">(of ${ls.map((l) => l.id.slice(1)).join(', ')})</span></label>
+      <div class="stepper">
+        <button class="btn" data-act="e-step" data-f="n" data-n="-1" aria-label="1 fewer">&minus;</button>
+        <input id="e-n" type="number" inputmode="numeric" min="0" max="${ls.length}" value="${esc(f.n)}">
+        <button class="btn" data-act="e-step" data-f="n" data-n="1" aria-label="1 more">+</button>
+      </div>`;
+    }
     return `<div class="form">
-      ${lt ? `<button class="btn" style="width:100%;justify-content:flex-start" data-act="ecg-lesson" aria-pressed="${!!f.lesson}">${f.lesson ? '&#10003; ' : ''}Finished ${esc(ECG_COURSES[lt.course].name)} level ${esc(lt.id.slice(1))} and its quiz</button>` : ''}
+      ${pick}
       <label for="e-read">ECGs read (practice or real ones at work)</label>
       <div class="stepper">
         <button class="btn" data-act="e-step" data-f="read" data-n="-1" aria-label="1 fewer">&minus;</button>
@@ -878,9 +980,9 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     let h = `<div class="sec-h"><h2>ECG track</h2><span class="small muted">${ds < S.ecg.start ? `starts ${esc(fmtDM(S.ecg.start))}` : 'a bonus, after questions'}</span></div>
       <section class="card">
         ${ph ? `<p><strong>${esc(ph.name)}</strong> <span class="muted">to ${esc(fmtDM(ph.to))}</span></p>${ph.goal ? `<p class="note">${esc(ph.goal)}</p>` : ''}` : ''}
-        <div class="row" style="margin-top:12px"><span>ECG Mastery levels</span><span class="num muted">${nDone} of ${lessons.length}</span></div>
+        <div class="row" style="margin-top:12px"><span>${esc([...new Set(lessons.map((l) => ECG_COURSES[l.course].name))].join(' and '))}</span><span class="num muted">${nDone} of ${lessons.length}</span></div>
         <div class="meter"><span style="width:${p}%"></span></div>
-        <p class="tip">${nx ? `Next: ${esc(ECG_COURSES[nx.course].name)} level ${esc(nx.id.slice(1))}, ${esc(nx.title)}.` : 'Course done. Now it is all unseen ECGs.'}</p>
+        <p class="tip">${nx ? `Next: ${esc(ecgLabel(nx))}, ${esc(nx.title)}.` : 'Course done. Now it is all unseen ECGs.'}</p>
         <div class="row" style="margin-top:12px"><span>This week</span><span class="num muted">${wk.sessions} of ${goal} sessions</span></div>
         <p class="tip">${plural(wk.read, 'ECG')} read this week${pctTxt(wk.right, wk.read)}. ${plural(tot.read, 'ECG')} in all${pctTxt(tot.right, tot.read)}. A missed session is dropped, never owed.</p>
         ${S.ecg.focus ? `<p class="tip">Focus this week: <strong>${esc(S.ecg.focus)}</strong></p>` : ''}
@@ -898,9 +1000,9 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     let rows = '';
     for (const l of lessons) {
       const d = done[l.id];
-      rows += `<div class="opt"><div class="opt-body"><div class="opt-title">${esc(l.id)} &middot; ${esc(l.title)}</div><div class="opt-sub">${l.min} min${d ? `, done ${esc(fmtDM(d))}` : ''}</div></div><button class="tick" data-act="ecg-tick" data-id="${esc(l.id)}" aria-pressed="${!!d}" aria-label="${esc(l.title)} done">${ICON_CHECK}</button></div>`;
+      rows += `<div class="opt"><div class="opt-body"><div class="opt-title">${esc(l.title)}</div><div class="opt-sub">${esc(ecgLabel(l))}${d ? `, done ${esc(fmtDM(d))}` : ''}</div></div><button class="tick" data-act="ecg-tick" data-id="${esc(l.id)}" aria-pressed="${!!d}" aria-label="${esc(l.title)} done">${ICON_CHECK}</button></div>`;
     }
-    h += `<section class="card list-card" style="margin-top:10px"><details class="more"><summary>All ${lessons.length} levels</summary>${rows}</details></section>`;
+    h += `<section class="card list-card" style="margin-top:10px"><details class="more"><summary>All ${lessons.length} levels and cases</summary>${rows}</details></section>`;
     return h;
   }
 
@@ -1432,17 +1534,18 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     'ecg-open'(el) {
       const ds = el.dataset.ds;
       const e = ecgDay(ds);
-      const nx = ecgNext();
+      const prevIds = ecgIds(e);
+      const ids = prevIds.length ? prevIds : ecgBatch().map((l) => l.id);
       S.ecgForm = e
-        ? { ds, lessonId: e.lesson || (nx && nx.id) || null, lesson: !!e.lesson, read: num(e.read, 0), right: num(e.right, 0) }
-        : { ds, lessonId: nx ? nx.id : null, lesson: !!nx, read: 3, right: '' };
+        ? { ds, ids, n: prevIds.length, read: num(e.read, 0), right: num(e.right, 0) }
+        : { ds, ids, n: ids.length, read: ids.length > 1 ? ids.length : 3, right: '' };
       render();
     },
     'ecg-cancel'() { S.ecgForm = null; render(); },
-    'ecg-lesson'() { S.ecgForm.lesson = !S.ecgForm.lesson; render(); },
+    'ecg-lesson'() { S.ecgForm.n = S.ecgForm.n > 0 ? 0 : 1; render(); },
     'e-step'(el) {
       const f = el.dataset.f;
-      S.ecgForm[f] = Math.max(0, Math.min(50, (Number(S.ecgForm[f]) || 0) + Number(el.dataset.n)));
+      S.ecgForm[f] = Math.max(0, Math.min(f === 'n' ? S.ecgForm.ids.length : 50, (Number(S.ecgForm[f]) || 0) + Number(el.dataset.n)));
       const i = $('#e-' + f); if (i) i.value = S.ecgForm[f];
     },
     async 'ecg-save'() {
@@ -1451,16 +1554,17 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       const right = f.right === '' || f.right == null ? 0 : Math.round(Number(f.right));
       if (read < 0 || read > 50) { toast('ECGs read should be between 0 and 50.'); return; }
       if (isNaN(right) || right < 0 || right > read) { toast('Right on the first read should be between 0 and the number you read.'); return; }
-      const lesson = f.lesson && f.lessonId ? f.lessonId : null;
-      if (!lesson && !read) { toast('Log a finished level or at least one ECG.'); return; }
+      const n = Math.max(0, Math.min(f.ids.length, Math.round(Number(f.n) || 0)));
+      const lessons = f.ids.slice(0, n);
+      if (!lessons.length && !read) { toast('Log a finished level or case, or at least one ECG.'); return; }
       const prev = ecgDay(f.ds);
       const ok = await write(async () => {
-        await docRef('extras', f.ds).set(Object.assign({}, S.extras[f.ds] || {}, { ecg: { lesson, read, right, at: new Date().toISOString() } }));
+        await docRef('extras', f.ds).set(Object.assign({}, S.extras[f.ds] || {}, { ecg: { lessons, lesson: lessons[0] || null, read, right, at: new Date().toISOString() } }));
         const done = Object.assign({}, ecgDone());
-        if (prev && prev.lesson && prev.lesson !== lesson && done[prev.lesson] === f.ds) delete done[prev.lesson];
-        if (lesson && !done[lesson]) done[lesson] = f.ds;
+        for (const id of ecgIds(prev)) if (!lessons.includes(id) && done[id] === f.ds) delete done[id];
+        for (const id of lessons) if (!done[id]) done[id] = f.ds;
         if (JSON.stringify(done) !== JSON.stringify(ecgDone())) await docRef('settings', 'ecg').set(Object.assign({}, S.ecg, { done }));
-      }, read ? `Logged ${plural(read, 'ECG')}. Good work.` : 'Level logged.');
+      }, read ? `Logged ${plural(read, 'ECG')}. Good work.` : 'Logged.');
       if (ok) { S.ecgForm = null; render(); }
     },
     async 'ecg-undo'(el) {
@@ -1471,7 +1575,9 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       await write(async () => {
         await (Object.keys(rest).length ? docRef('extras', ds).set(rest) : docRef('extras', ds).delete());
         const done = Object.assign({}, ecgDone());
-        if (prev && prev.lesson && done[prev.lesson] === ds) { delete done[prev.lesson]; await docRef('settings', 'ecg').set(Object.assign({}, S.ecg, { done })); }
+        let changed = false;
+        for (const id of ecgIds(prev)) if (done[id] === ds) { delete done[id]; changed = true; }
+        if (changed) await docRef('settings', 'ecg').set(Object.assign({}, S.ecg, { done }));
       }, 'Undone.');
     },
     async 'ecg-tick'(el) {
@@ -1634,6 +1740,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     else if (t.id === 'c-link') S.cap.link = t.value;
     else if (t.id === 'e-read' && S.ecgForm) S.ecgForm.read = t.value;
     else if (t.id === 'e-right' && S.ecgForm) S.ecgForm.right = t.value;
+    else if (t.id === 'e-n' && S.ecgForm) S.ecgForm.n = t.value;
     else if (t.id === 'c-area') S.cap.area = t.value;
     else if (t.id === 'p-q') {
       S.pearlQuery = t.value;
