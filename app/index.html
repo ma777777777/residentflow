@@ -542,7 +542,46 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     vacation: { label: 'Vacation', tone: 't-off' },
     pulled: { label: 'Pulled in', tone: 't-warn' },
   };
-  const AREAS = ['Cardiology', 'Pulmonology', 'Critical care', 'Gastroenterology & hepatology', 'Nephrology', 'Endocrinology', 'Hematology & oncology', 'Infectious disease', 'Rheumatology', 'Neurology', 'Geriatrics & general IM', 'Other'];
+  // ---------- ECG track ----------
+  // Medmastery ECG Mastery (Yellow then Blue Belt), one level per session, each followed by
+  // ECGs read before looking at the answer. Plan, phases and weekly focus live in settings/ecg.
+  const ECG_COURSES = {
+    yellow: { name: 'Yellow Belt', url: 'https://www.medmastery.com/course/ecg-mastery-yellow-belt' },
+    blue: { name: 'Blue Belt', url: 'https://www.medmastery.com/course/ecg-mastery-blue-belt' },
+  };
+  // [id, course, level title, minutes of video, practice search term]
+  const ECG_LESSONS = [
+    ['Y1', 'yellow', 'The ECG curve', 13, 'ECG basics'],
+    ['Y2', 'yellow', 'Measurements', 6, 'ECG intervals'],
+    ['Y3', 'yellow', 'Interpretation of durations', 7, 'bundle branch block'],
+    ['Y4', 'yellow', 'The precordial leads', 16, 'R wave progression'],
+    ['Y5', 'yellow', 'The precordial leads, advanced', 8, 'R wave progression'],
+    ['Y6', 'yellow', 'Ventricular hypertrophy', 8, 'left ventricular hypertrophy'],
+    ['Y7', 'yellow', 'ST patterns', 7, 'ST depression'],
+    ['Y8', 'yellow', 'Introduction to myocardial infarction', 20, 'anterior STEMI'],
+    ['Y9', 'yellow', 'Inferior wall MI', 12, 'inferior STEMI'],
+    ['Y10', 'yellow', 'Mastering the ST segment', 16, 'myocardial ischaemia'],
+    ['Y11', 'yellow', 'Axis, atrial hypertrophy, low voltage', 22, 'ECG axis'],
+    ['Y12', 'yellow', 'Electrolyte imbalances', 9, 'hyperkalaemia'],
+    ['Y13', 'yellow', 'Normal sinus rhythm', 4, 'sinus rhythm'],
+    ['B1', 'blue', 'Normal sinus rhythm, regular or irregular', 7, 'sinus arrhythmia'],
+    ['B2', 'blue', 'Life-threatening rhythms', 6, 'ventricular tachycardia'],
+    ['B3', 'blue', 'Rapid, regular, broad rhythms', 7, 'broad complex tachycardia'],
+    ['B4', 'blue', 'Rapid, regular, narrow rhythms', 14, 'SVT'],
+    ['B5', 'blue', 'Abnormal P waves: junctional rhythm, AF', 15, 'junctional rhythm'],
+    ['B6', 'blue', 'Excess P waves', 8, 'atrial flutter'],
+    ['B7', 'blue', 'High-degree AV blocks', 16, 'AV block'],
+    ['B8', 'blue', 'The basic rhythm and its interruptions', 5, 'premature beats'],
+    ['B9', 'blue', 'Unexpected beats', 16, 'ectopic beats'],
+    ['B10', 'blue', 'Pauses and AV dissociation', 21, 'AV dissociation'],
+    ['B11', 'blue', 'Pacemakers', 16, 'pacemaker ECG'],
+  ].map(([id, course, title, min, q]) => ({ id, course, title, min, q }));
+  const ECG_LINKS = {
+    library: 'https://litfl.com/ecg-library/',
+    top150: 'https://litfl.com/top-100/ecg',
+    maven: 'https://ecg.bidmc.harvard.edu/maven/mavenmain.asp',
+  };
+  const AREAS = ['Cardiology', 'ECG', 'Pulmonology', 'Critical care', 'Gastroenterology & hepatology', 'Nephrology', 'Endocrinology', 'Hematology & oncology', 'Infectious disease', 'Rheumatology', 'Neurology', 'Geriatrics & general IM', 'Other'];
   // Plan rows store the exact AMBOSS filter label; the app shows the specialty name.
   // AMBOSS has no Cardiology or Nephrology discipline: specialties map to Systems,
   // except ID, oncology, critical care and geriatrics, which are Disciplines.
@@ -577,6 +616,8 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     captures: [],
     sessions: {},
     settings: {},
+    ecg: {}, // settings/ecg: start, owned, done {lessonId: date}, focus, phases, assessments, weeklyGoal
+    ecgForm: null, // { ds, lesson, read, right }
     form: null, // { ds, q, pct }
     sheet: null, // { kind: 'day', ds } | { kind: 'capture' } | { kind: 'learned', id }
     cap: { kind: 'lookup', text: '', area: 'Cardiology', link: '', phi: null },
@@ -717,6 +758,150 @@ td.topic-cell { white-space: normal; min-width: 140px; }
         <li>Questions: ${st.count}, Study mode, then Start</li>`;
   }
 
+  // ---------- ECG derived ----------
+  function ecgOwned() {
+    const o = Array.isArray(S.ecg.owned) && S.ecg.owned.length ? S.ecg.owned : ['yellow', 'blue'];
+    return ECG_LESSONS.filter((l) => o.includes(l.course));
+  }
+  function ecgDone() { return (S.ecg.done && typeof S.ecg.done === 'object') ? S.ecg.done : {}; }
+  function ecgNext() { const d = ecgDone(); return ecgOwned().find((l) => !d[l.id]) || null; }
+  function ecgPhase(ds) {
+    const ph = Array.isArray(S.ecg.phases) ? S.ecg.phases : [];
+    return ph.find((p) => p.from <= ds && ds <= p.to) || null;
+  }
+  const ecgDay = (ds) => (S.extras[ds] && S.extras[ds].ecg) || null;
+  function ecgWeek(ws) {
+    let sessions = 0, read = 0, right = 0;
+    for (let i = 0; i < 7; i++) {
+      const e = ecgDay(addDays(ws, i));
+      if (!e) continue;
+      sessions++; read += num(e.read, 0); right += num(e.right, 0);
+    }
+    return { sessions, read, right };
+  }
+  function ecgTotals() {
+    let read = 0, right = 0, days = 0;
+    for (const x of Object.values(S.extras)) { if (x && x.ecg) { days++; read += num(x.ecg.read, 0); right += num(x.ecg.right, 0); } }
+    return { read, right, days };
+  }
+  // Mistake log = pearls with area ECG, written "Topic: what I missed". Count open ones by topic.
+  function ecgWeakSpots() {
+    const counts = {};
+    for (const c of S.captures) {
+      if (isLookup(c) || c.area !== 'ECG' || c.status === 'retired') continue;
+      const t = String(c.text || '').split(':')[0].trim().slice(0, 40);
+      if (t && t.length < String(c.text).length) counts[t] = (counts[t] || 0) + 1;
+    }
+    return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 3);
+  }
+  const ecgPracticeUrl = (l) => (l ? `https://litfl.com/?s=${encodeURIComponent(l.q)}` : ECG_LINKS.top150);
+  // ECG is a bonus: it shows once today's questions are done (or on a day off), never on
+  // call, post-call, night, pulled-in or rough days.
+  function ecgShowsToday(ds, di, st) {
+    if (!S.ecg.start || ds < S.ecg.start) return false;
+    if (['call', 'postcall', 'night', 'pulled'].includes(di.type) || di.rough) return false;
+    const l = S.log[ds];
+    return !!(ecgDay(ds) || (l && l.status === 'done') || (st.kind === 'rest' && ['off', 'vacation'].includes(di.type)));
+  }
+  function ecgCard(ds, di, st) {
+    if (!ecgShowsToday(ds, di, st)) return '';
+    const e = ecgDay(ds);
+    const formOpen = S.ecgForm && S.ecgForm.ds === ds;
+    const nx = ecgNext();
+    const focus = S.ecg.focus ? `<p class="note">This week's focus: <strong>${esc(S.ecg.focus)}</strong></p>` : '';
+    let h = '<div class="sec-h"><h2>ECG bonus</h2></div><section class="card">';
+    if (e && !formOpen) {
+      const lt = e.lesson ? ECG_LESSONS.find((x) => x.id === e.lesson) : null;
+      h += `<div class="eyebrow" style="color:var(--off)">ECG done today</div>
+        <p class="note">${lt ? `${esc(ECG_COURSES[lt.course].name)} level ${esc(lt.id.slice(1))}: ${esc(lt.title)}. ` : ''}${plural(num(e.read, 0), 'ECG')} read${e.read ? `, ${num(e.right, 0)} right on the first read` : ''}.</p>
+        <p class="tip">Missed something? Capture it as a pearl, area ECG, written "Topic: what I missed".</p>
+        <div class="sub-actions"><button class="link quiet" data-act="ecg-open" data-ds="${ds}">Edit</button><button class="link quiet" data-act="ecg-undo" data-ds="${ds}">Undo</button></div>`;
+      return h + '</section>';
+    }
+    if (nx) {
+      h += `<div class="eyebrow">Bonus, about 20 minutes</div>
+        <div class="topic">${esc(ECG_COURSES[nx.course].name)} level ${esc(nx.id.slice(1))}: ${esc(nx.title)}</div>
+        <p class="note">${nx.min} min of video, then its quiz.</p>${focus}
+        <ol class="steps"><li>Watch the level and pass its quiz</li><li>Read 2 or 3 ECGs on it: write your read before you look at the answer</li><li>Anything you missed: Capture a pearl, area ECG</li></ol>`;
+    } else {
+      h += `<div class="eyebrow">Bonus, about 15 minutes</div>
+        <div class="topic">Read 3 unseen ECGs</div>${focus}
+        <ol class="steps"><li>Write your full read: rate, rhythm, axis, intervals, morphology, ST and T, then the one-line diagnosis</li><li>Only then open the answer</li><li>Anything you missed: Capture a pearl, area ECG</li></ol>`;
+    }
+    if (formOpen) {
+      h += ecgForm();
+    } else {
+      h += `<div class="actions">
+          ${nx ? `<a class="btn primary" href="${esc(ECG_COURSES[nx.course].url)}" target="_blank" rel="noopener">Medmastery</a>` : ''}
+          <a class="btn${nx ? '' : ' primary'}" href="${esc(nx ? ecgPracticeUrl(nx) : ECG_LINKS.top150)}" target="_blank" rel="noopener">Practice ECGs</a>
+        </div>
+        <div class="sub-actions"><button class="link" data-act="ecg-open" data-ds="${ds}">Log it</button><span class="small muted">Only 5 minutes? Just read 2 ECGs and log those.</span></div>`;
+    }
+    return h + '</section>';
+  }
+  function ecgForm() {
+    const f = S.ecgForm;
+    const nx = ecgNext();
+    const lt = f.lessonId ? ECG_LESSONS.find((x) => x.id === f.lessonId) : nx;
+    return `<div class="form">
+      ${lt ? `<button class="btn" style="width:100%;justify-content:flex-start" data-act="ecg-lesson" aria-pressed="${!!f.lesson}">${f.lesson ? '&#10003; ' : ''}Finished ${esc(ECG_COURSES[lt.course].name)} level ${esc(lt.id.slice(1))} and its quiz</button>` : ''}
+      <label for="e-read">ECGs read (practice or real ones at work)</label>
+      <div class="stepper">
+        <button class="btn" data-act="e-step" data-f="read" data-n="-1" aria-label="1 fewer">&minus;</button>
+        <input id="e-read" type="number" inputmode="numeric" min="0" max="50" value="${esc(f.read)}">
+        <button class="btn" data-act="e-step" data-f="read" data-n="1" aria-label="1 more">+</button>
+      </div>
+      <label for="e-right">Right on the first read <span class="faint">(main diagnosis, before the answer)</span></label>
+      <input id="e-right" type="number" inputmode="numeric" min="0" max="50" value="${esc(f.right)}">
+      <div class="actions">
+        <button class="btn primary" data-act="ecg-save">Save</button>
+        <button class="btn ghost" data-act="ecg-cancel">Cancel</button>
+      </div>
+    </div>`;
+  }
+  function ecgStudySection(ds) {
+    if (!S.ecg.start) return '';
+    const done = ecgDone();
+    const lessons = ecgOwned();
+    const nDone = lessons.filter((l) => done[l.id]).length;
+    const p = lessons.length ? Math.round((nDone / lessons.length) * 100) : 0;
+    const wk = ecgWeek(weekStart(ds));
+    const tot = ecgTotals();
+    const goal = num(S.ecg.weeklyGoal, 3);
+    const ph = ecgPhase(ds);
+    const nx = ecgNext();
+    const weak = ecgWeakSpots();
+    const asm = (Array.isArray(S.ecg.assessments) ? S.ecg.assessments : []).slice().sort((a, b) => (a.date < b.date ? 1 : -1));
+    const pctTxt = (r, n) => (n ? ` (${Math.round((r / n) * 100)}% right first time)` : '');
+    let h = `<div class="sec-h"><h2>ECG track</h2><span class="small muted">${ds < S.ecg.start ? `starts ${esc(fmtDM(S.ecg.start))}` : 'a bonus, after questions'}</span></div>
+      <section class="card">
+        ${ph ? `<p><strong>${esc(ph.name)}</strong> <span class="muted">to ${esc(fmtDM(ph.to))}</span></p>${ph.goal ? `<p class="note">${esc(ph.goal)}</p>` : ''}` : ''}
+        <div class="row" style="margin-top:12px"><span>ECG Mastery levels</span><span class="num muted">${nDone} of ${lessons.length}</span></div>
+        <div class="meter"><span style="width:${p}%"></span></div>
+        <p class="tip">${nx ? `Next: ${esc(ECG_COURSES[nx.course].name)} level ${esc(nx.id.slice(1))}, ${esc(nx.title)}.` : 'Course done. Now it is all unseen ECGs.'}</p>
+        <div class="row" style="margin-top:12px"><span>This week</span><span class="num muted">${wk.sessions} of ${goal} sessions</span></div>
+        <p class="tip">${plural(wk.read, 'ECG')} read this week${pctTxt(wk.right, wk.read)}. ${plural(tot.read, 'ECG')} in all${pctTxt(tot.right, tot.read)}. A missed session is dropped, never owed.</p>
+        ${S.ecg.focus ? `<p class="tip">Focus this week: <strong>${esc(S.ecg.focus)}</strong></p>` : ''}
+      </section>`;
+    h += `<div class="sec-h"><h2>ECG weak spots</h2><span class="small muted">from your ECG pearls</span></div><section class="card">`;
+    h += weak.length
+      ? `<p>${weak.map(([t, n]) => `<strong>${esc(t)}</strong> <span class="muted">(${n})</span>`).join(', ')}</p><p class="tip">Claude weights next week's ECG focus toward these.</p>`
+      : '<p class="small muted">No ECG mistakes logged yet. When you miss something, Capture a pearl with area ECG, written "Topic: what I missed" (for example "AV block: 2:1 block can be Mobitz I or II"). It comes back in 3 days and 2 weeks.</p>';
+    h += '</section>';
+    h += `<div class="sec-h"><h2>ECG check-ups</h2><span class="small muted">unseen ECGs, scored</span></div><section class="card list-card">`;
+    h += asm.length
+      ? `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Set</th><th class="r">Right</th><th class="r">Danger missed</th></tr></thead><tbody>${asm.map((a) => `<tr><td>${esc(fmtDM(a.date))}</td><td class="topic-cell">${esc(a.label || '')}</td><td class="r">${num(a.right, 0)}/${num(a.total, 0)}</td><td class="r">${a.dangerMissed == null ? '&ndash;' : num(a.dangerMissed, 0)}</td></tr>`).join('')}</tbody></table></div>`
+      : '<div class="empty">The baseline check-up comes first: 20 unseen ECGs, scored with Claude.</div>';
+    h += '</section>';
+    let rows = '';
+    for (const l of lessons) {
+      const d = done[l.id];
+      rows += `<div class="opt"><div class="opt-body"><div class="opt-title">${esc(l.id)} &middot; ${esc(l.title)}</div><div class="opt-sub">${l.min} min${d ? `, done ${esc(fmtDM(d))}` : ''}</div></div><button class="tick" data-act="ecg-tick" data-id="${esc(l.id)}" aria-pressed="${!!d}" aria-label="${esc(l.title)} done">${ICON_CHECK}</button></div>`;
+    }
+    h += `<section class="card list-card" style="margin-top:10px"><details class="more"><summary>All ${lessons.length} levels</summary>${rows}</details></section>`;
+    return h;
+  }
+
   // ---------- writes ----------
   function toast(msg) {
     const t = $('#toast');
@@ -781,6 +966,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     h += yesterdayNudge(ds);
     h += jobCard(ds, di, st);
     h += sessionsCard(ds, di);
+    h += ecgCard(ds, di, st);
 
     // optional extras, at most two: one Learn row (a look-up on lighter days, pearls due) and Anki
     const due = pearlsDue(ds);
@@ -1015,6 +1201,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       </section>
       ${amb}
       ${exam}
+      ${ecgStudySection(ds)}
       <div class="sec-h"><h2>History</h2></div>
       <section class="card list-card">
         ${rows ? `<div class="table-wrap"><table><thead><tr><th>Day</th><th>Topic</th><th class="r">Qs</th><th class="r">Correct</th></tr></thead><tbody>${rows}</tbody></table></div>` : '<div class="empty">Nothing logged yet. Your first "I\'m done" shows up here.</div>'}
@@ -1239,7 +1426,58 @@ td.topic-cell { white-space: normal; min-width: 140px; }
 
   // ---------- actions ----------
   const ACT = {
-    tab(el) { S.view = el.dataset.view; S.form = null; S.confirmDel = null; render(); window.scrollTo(0, 0); },
+    tab(el) { S.view = el.dataset.view; S.form = null; S.ecgForm = null; S.confirmDel = null; render(); window.scrollTo(0, 0); },
+    'ecg-open'(el) {
+      const ds = el.dataset.ds;
+      const e = ecgDay(ds);
+      const nx = ecgNext();
+      S.ecgForm = e
+        ? { ds, lessonId: e.lesson || (nx && nx.id) || null, lesson: !!e.lesson, read: num(e.read, 0), right: num(e.right, 0) }
+        : { ds, lessonId: nx ? nx.id : null, lesson: !!nx, read: 3, right: '' };
+      render();
+    },
+    'ecg-cancel'() { S.ecgForm = null; render(); },
+    'ecg-lesson'() { S.ecgForm.lesson = !S.ecgForm.lesson; render(); },
+    'e-step'(el) {
+      const f = el.dataset.f;
+      S.ecgForm[f] = Math.max(0, Math.min(50, (Number(S.ecgForm[f]) || 0) + Number(el.dataset.n)));
+      const i = $('#e-' + f); if (i) i.value = S.ecgForm[f];
+    },
+    async 'ecg-save'() {
+      const f = S.ecgForm;
+      const read = Math.round(Number(f.read) || 0);
+      const right = f.right === '' || f.right == null ? 0 : Math.round(Number(f.right));
+      if (read < 0 || read > 50) { toast('ECGs read should be between 0 and 50.'); return; }
+      if (isNaN(right) || right < 0 || right > read) { toast('Right on the first read should be between 0 and the number you read.'); return; }
+      const lesson = f.lesson && f.lessonId ? f.lessonId : null;
+      if (!lesson && !read) { toast('Log a finished level or at least one ECG.'); return; }
+      const prev = ecgDay(f.ds);
+      const ok = await write(async () => {
+        await docRef('extras', f.ds).set(Object.assign({}, S.extras[f.ds] || {}, { ecg: { lesson, read, right, at: new Date().toISOString() } }));
+        const done = Object.assign({}, ecgDone());
+        if (prev && prev.lesson && prev.lesson !== lesson && done[prev.lesson] === f.ds) delete done[prev.lesson];
+        if (lesson && !done[lesson]) done[lesson] = f.ds;
+        if (JSON.stringify(done) !== JSON.stringify(ecgDone())) await docRef('settings', 'ecg').set(Object.assign({}, S.ecg, { done }));
+      }, read ? `Logged ${plural(read, 'ECG')}. Good work.` : 'Level logged.');
+      if (ok) { S.ecgForm = null; render(); }
+    },
+    async 'ecg-undo'(el) {
+      const ds = el.dataset.ds;
+      const prev = ecgDay(ds);
+      const rest = Object.assign({}, S.extras[ds] || {});
+      delete rest.ecg;
+      await write(async () => {
+        await (Object.keys(rest).length ? docRef('extras', ds).set(rest) : docRef('extras', ds).delete());
+        const done = Object.assign({}, ecgDone());
+        if (prev && prev.lesson && done[prev.lesson] === ds) { delete done[prev.lesson]; await docRef('settings', 'ecg').set(Object.assign({}, S.ecg, { done })); }
+      }, 'Undone.');
+    },
+    async 'ecg-tick'(el) {
+      const id = el.dataset.id;
+      const done = Object.assign({}, ecgDone());
+      if (done[id]) delete done[id]; else done[id] = todayStr();
+      await write(() => docRef('settings', 'ecg').set(Object.assign({}, S.ecg, { done })));
+    },
     capture() { openSheet({ kind: 'capture' }); },
     'sheet-close'() { closeSheet(); },
     'day-open'(el) { openSheet({ kind: 'day', ds: el.dataset.ds }); },
@@ -1306,7 +1544,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     async anki(el) {
       const ds = el.dataset.ds;
       const on = !(S.extras[ds] && S.extras[ds].anki);
-      await write(() => docRef('extras', ds).set({ anki: on }));
+      await write(() => docRef('extras', ds).set(Object.assign({}, S.extras[ds] || {}, { anki: on })));
     },
     async 'pearl-ok'(el) {
       const c = S.captures.find((x) => x.id === el.dataset.id); if (!c) return;
@@ -1368,7 +1606,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       let dl = null;
       try { dl = window.claude && window.claude.use ? await window.claude.use('downloads') : null; } catch (e) { dl = null; }
       if (!dl) { toast('Downloads are not available in this view.'); return; }
-      const data = { exportedAt: new Date().toISOString(), blocks: S.blocks, plan: S.plan, log: S.log, days: S.days, extras: S.extras, captures: S.captures, sessions: S.sessions, settings: S.settings };
+      const data = { exportedAt: new Date().toISOString(), blocks: S.blocks, plan: S.plan, log: S.log, days: S.days, extras: S.extras, captures: S.captures, sessions: S.sessions, settings: S.settings, ecg: S.ecg };
       try { await dl.save({ filename: `residentflow-backup-${todayStr()}.json`, data: JSON.stringify(data, null, 2) }); }
       catch (e) { if (!e || e.code !== 'declined') toast('Could not save the file.'); }
     },
@@ -1392,6 +1630,8 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     else if (t.id === 'c-text') { S.cap.text = t.value; const n = $('#c-count'); if (n) n.textContent = `${t.value.length}/280`; }
     else if (t.id === 'l-text') { S.learned.text = t.value; const n = $('#l-count'); if (n) n.textContent = `${t.value.length}/280`; }
     else if (t.id === 'c-link') S.cap.link = t.value;
+    else if (t.id === 'e-read' && S.ecgForm) S.ecgForm.read = t.value;
+    else if (t.id === 'e-right' && S.ecgForm) S.ecgForm.right = t.value;
     else if (t.id === 'c-area') S.cap.area = t.value;
     else if (t.id === 'p-q') {
       S.pearlQuery = t.value;
@@ -1416,7 +1656,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     if (!c || typeof c.use !== 'function') { S.status = 'nodb'; render(); return; }
     try { db = await c.use('db'); } catch (e) { db = null; }
     if (!db) { S.status = 'nodb'; render(); return; }
-    const waiting = new Set(['blocks', 'plan', 'log', 'days', 'extras', 'captures', 'sessions', 'settings']);
+    const waiting = new Set(['blocks', 'plan', 'log', 'days', 'extras', 'captures', 'sessions', 'settings', 'ecg']);
     const arrived = (k) => {
       if (waiting.delete(k) && waiting.size === 0) S.status = 'ready';
       if (S.status !== 'loading') { render(); if (S.sheet && S.sheet.kind === 'day') renderSheet(); }
@@ -1438,6 +1678,7 @@ td.topic-cell { white-space: normal; min-width: 140px; }
       arrived('captures');
     }, onErr('captures'));
     db.doc('settings/main').onSnapshot((d) => { S.settings = (d.exists && d.data()) || {}; arrived('settings'); }, onErr('settings'));
+    db.doc('settings/ecg').onSnapshot((d) => { S.ecg = (d.exists && d.data()) || {}; arrived('ecg'); }, onErr('ecg'));
     setTimeout(() => { if (S.status === 'loading') { S.status = 'ready'; render(); } }, 9000);
   }
 
