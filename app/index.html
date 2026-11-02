@@ -769,6 +769,8 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     const ph = Array.isArray(S.ecg.phases) ? S.ecg.phases : [];
     return ph.find((p) => p.from <= ds && ds <= p.to) || null;
   }
+  // A course he finished before: test out with the quiz instead of rewatching.
+  const ecgRefresh = (l) => Array.isArray(S.ecg.priorCompleted) && S.ecg.priorCompleted.includes(l.course);
   const ecgDay = (ds) => (S.extras[ds] && S.extras[ds].ecg) || null;
   function ecgWeek(ws) {
     let sessions = 0, read = 0, right = 0;
@@ -821,8 +823,8 @@ td.topic-cell { white-space: normal; min-width: 140px; }
     if (nx) {
       h += `<div class="eyebrow">Bonus, about 20 minutes</div>
         <div class="topic">${esc(ECG_COURSES[nx.course].name)} level ${esc(nx.id.slice(1))}: ${esc(nx.title)}</div>
-        <p class="note">${nx.min} min of video, then its quiz.</p>${focus}
-        <ol class="steps"><li>Watch the level and pass its quiz</li><li>Read 2 or 3 ECGs on it: write your read before you look at the answer</li><li>Anything you missed: Capture a pearl, area ECG</li></ol>`;
+        <p class="note">${ecgRefresh(nx) ? `Refresher: quiz first, then the ${nx.min} min video only if you missed something.` : `${nx.min} min of video, then its quiz.`}</p>${focus}
+        <ol class="steps"><li>${ecgRefresh(nx) ? 'Take the level quiz first. Missed any? Watch the video' : 'Watch the level and pass its quiz'}</li><li>Read 2 or 3 ECGs on it: write your read before you look at the answer</li><li>Anything you missed: Capture a pearl, area ECG</li></ol>`;
     } else {
       h += `<div class="eyebrow">Bonus, about 15 minutes</div>
         <div class="topic">Read 3 unseen ECGs</div>${focus}
