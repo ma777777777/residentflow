@@ -1,0 +1,923 @@
+{
+  "exportedAt": "2026-11-08T08:43:27Z",
+  "blocks": [
+    {
+      "id": "1",
+      "code": "Free Elective",
+      "end": "2026-06-29",
+      "start": "2026-06-15"
+    },
+    {
+      "id": "10A",
+      "code": "CCU",
+      "end": "2027-02-22",
+      "start": "2027-02-09"
+    },
+    {
+      "id": "10B",
+      "code": "OPD-ICU",
+      "end": "2027-03-08",
+      "start": "2027-02-23"
+    },
+    {
+      "id": "11A",
+      "code": "Adm PM",
+      "end": "2027-03-22",
+      "start": "2027-03-09"
+    },
+    {
+      "id": "11B",
+      "code": "Floor B2",
+      "end": "2027-04-05",
+      "label": "Floor B2",
+      "start": "2027-03-23"
+    },
+    {
+      "id": "12A",
+      "code": "Adm AM",
+      "end": "2027-04-19",
+      "start": "2027-04-06"
+    },
+    {
+      "id": "12B",
+      "code": "ICU",
+      "end": "2027-05-03",
+      "start": "2027-04-20"
+    },
+    {
+      "id": "13A",
+      "code": "Free Elective",
+      "end": "2027-05-17",
+      "start": "2027-05-04"
+    },
+    {
+      "id": "13B",
+      "code": "Free Elective",
+      "end": "2027-05-31",
+      "start": "2027-05-18"
+    },
+    {
+      "id": "14",
+      "code": "CCU",
+      "end": "2027-06-13",
+      "start": "2027-06-01"
+    },
+    {
+      "id": "2A",
+      "code": "ICU",
+      "end": "2026-07-13",
+      "start": "2026-06-30"
+    },
+    {
+      "id": "2B",
+      "code": "ICU",
+      "end": "2026-07-27",
+      "start": "2026-07-14"
+    },
+    {
+      "id": "3A",
+      "code": "EJ",
+      "end": "2026-08-10",
+      "start": "2026-07-28"
+    },
+    {
+      "id": "3B",
+      "code": "Vacation",
+      "end": "2026-08-24",
+      "start": "2026-08-11"
+    },
+    {
+      "id": "4A",
+      "code": "E-CCU",
+      "end": "2026-09-07",
+      "start": "2026-08-25"
+    },
+    {
+      "id": "4B",
+      "code": "Adm AM",
+      "end": "2026-09-21",
+      "start": "2026-09-08"
+    },
+    {
+      "id": "5A",
+      "code": "ED",
+      "end": "2026-10-05",
+      "start": "2026-09-22"
+    },
+    {
+      "id": "5B",
+      "code": "EJ",
+      "end": "2026-10-19",
+      "start": "2026-10-06"
+    },
+    {
+      "id": "6A",
+      "code": "Float",
+      "end": "2026-11-02",
+      "start": "2026-10-20"
+    },
+    {
+      "id": "6B",
+      "code": "EJ",
+      "end": "2026-11-17",
+      "hours": "8 or 9 am to 12 pm",
+      "label": "Rheumatology elective (jeopardy list)",
+      "slot": "2 pm, after the elective",
+      "start": "2026-11-03"
+    },
+    {
+      "id": "7A",
+      "code": "Floor 9N",
+      "end": "2026-11-30",
+      "label": "Floor 9N",
+      "start": "2026-11-18"
+    },
+    {
+      "id": "7B",
+      "code": "EJ",
+      "end": "2026-12-14",
+      "start": "2026-12-01"
+    },
+    {
+      "id": "8A",
+      "code": "ED",
+      "end": "2026-12-28",
+      "start": "2026-12-15"
+    },
+    {
+      "id": "8B",
+      "code": "CCU",
+      "end": "2027-01-11",
+      "start": "2026-12-29"
+    },
+    {
+      "id": "9A",
+      "code": "Vacation",
+      "end": "2027-01-25",
+      "start": "2027-01-12"
+    },
+    {
+      "id": "9B",
+      "code": "E-CCU",
+      "end": "2027-02-08",
+      "start": "2027-01-26"
+    }
+  ],
+  "plan": {
+    "2026-10-25": {
+      "count": 10,
+      "filter": "Systems",
+      "kind": "study",
+      "topic": "Cardiovascular System"
+    },
+    "2026-10-26": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Infectious Disease"
+    },
+    "2026-10-27": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Pulmonary Disease"
+    },
+    "2026-10-28": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Gastroenterology"
+    },
+    "2026-10-29": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Endocrinology, Diabetes, and Metabolism"
+    },
+    "2026-10-30": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Nephrology and Urology"
+    },
+    "2026-10-31": {
+      "count": 0,
+      "kind": "rest",
+      "note": "Rest day. If you feel like it: a few of your Marked questions, nothing more."
+    },
+    "2026-11-01": {
+      "count": 15,
+      "filter": "Module",
+      "kind": "study",
+      "note": "A rheumatology primer before your elective starts on Tuesday.",
+      "slot": "11 am",
+      "topic": "Rheumatology and Orthopedics"
+    },
+    "2026-11-02": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Last night of Float. Geriatrics was one of your lower ITE areas, and this module is new.",
+      "topic": "Geriatric Syndromes"
+    },
+    "2026-11-03": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Cardiovascular Disease"
+    },
+    "2026-11-04": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Also read up on early spondyloarthritis in AMBOSS: you missed it on both ITEs.",
+      "topic": "Rheumatology and Orthopedics"
+    },
+    "2026-11-05": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Nephrology was your lowest ITE score (69%). Also read up on tumor lysis syndrome: missed on both ITEs.",
+      "topic": "Nephrology and Urology"
+    },
+    "2026-11-06": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Allergy and Immunology"
+    },
+    "2026-11-07": {
+      "count": 10,
+      "kind": "review",
+      "note": "Only questions you marked this week.",
+      "optional": true,
+      "slot": "11 am"
+    },
+    "2026-11-08": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "slot": "11 am",
+      "topic": "Gastroenterology"
+    },
+    "2026-11-09": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Rheumatology and Orthopedics"
+    },
+    "2026-11-10": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Also read up on ventilator weaning, acute hypoventilation and inhalation injury: each missed on both ITEs.",
+      "topic": "Pulmonary Disease"
+    },
+    "2026-11-11": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Infectious Disease"
+    },
+    "2026-11-12": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Covers the substance use and depression questions you missed on the ITE.",
+      "topic": "Psychiatry"
+    },
+    "2026-11-13": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "topic": "Nephrology and Urology"
+    },
+    "2026-11-14": {
+      "count": 10,
+      "kind": "review",
+      "note": "Only questions you marked this week.",
+      "optional": true,
+      "slot": "11 am"
+    },
+    "2026-11-15": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Last weekend of your rheumatology elective.",
+      "slot": "11 am",
+      "topic": "Rheumatology and Orthopedics"
+    },
+    "2026-11-16": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "GI dropped the most on your ITE, from the 98th to the 69th percentile.",
+      "topic": "Gastroenterology"
+    },
+    "2026-11-17": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Last day of the elective. Hematology is a strong area: this keeps it fresh.",
+      "topic": "Hematology"
+    },
+    "2026-11-18": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "First day on Floor 9N.",
+      "topic": "Pulmonary Disease"
+    },
+    "2026-11-19": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Geriatrics was one of your lower ITE areas, and the floor is full of it.",
+      "topic": "Geriatric Syndromes"
+    },
+    "2026-11-20": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "A new module. It covers the skin questions you missed on the ITE.",
+      "topic": "Dermatology"
+    },
+    "2026-11-21": {
+      "count": 10,
+      "kind": "review",
+      "note": "Only questions you marked this week.",
+      "optional": true
+    },
+    "2026-11-22": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Nephrology was your lowest ITE score (69%).",
+      "topic": "Nephrology and Urology"
+    },
+    "2026-11-23": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Your first neurology since the reset. A strong area: this keeps it fresh.",
+      "topic": "Neurology"
+    },
+    "2026-11-24": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Your lowest module so far (61%). This should finish it.",
+      "topic": "Geriatric Syndromes"
+    },
+    "2026-11-25": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "Rheumatology was your lowest ITE percentile (52nd).",
+      "topic": "Rheumatology and Orthopedics"
+    },
+    "2026-11-26": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "A new module. It covers general medicine questions like the ones you missed on the ITE, and fits the floor.",
+      "topic": "Complex Medical Care"
+    },
+    "2026-11-27": {
+      "count": 10,
+      "filter": "Module",
+      "kind": "study",
+      "note": "A strong area, last done Nov 3: this keeps it fresh.",
+      "topic": "Cardiovascular Disease"
+    },
+    "2026-11-28": {
+      "count": 10,
+      "kind": "review",
+      "note": "Only questions you marked this week.",
+      "optional": true
+    }
+  },
+  "log": {
+    "2026-10-25": {
+      "at": "2026-10-26T14:50:18.624Z",
+      "pct": null,
+      "questions": 10,
+      "status": "done",
+      "topic": "Cardiology"
+    },
+    "2026-10-26": {
+      "at": "2026-10-26T16:00:11.528Z",
+      "pct": null,
+      "questions": 10,
+      "status": "done",
+      "topic": "Infectious disease"
+    },
+    "2026-10-27": {
+      "at": "2026-10-28T17:54:56.463Z",
+      "pct": null,
+      "questions": 0,
+      "status": "skipped",
+      "topic": "Pulmonology"
+    },
+    "2026-10-28": {
+      "at": "2026-10-29T00:25:52.473Z",
+      "pct": null,
+      "questions": 11,
+      "status": "done",
+      "topic": "Gastroenterology"
+    },
+    "2026-10-29": {
+      "at": "2026-10-30T05:45:19.074Z",
+      "pct": null,
+      "questions": 2,
+      "status": "done",
+      "topic": "Endocrinology"
+    },
+    "2026-10-30": {
+      "at": "2026-10-30T23:58:19.314Z",
+      "pct": null,
+      "questions": 0,
+      "status": "skipped",
+      "topic": "Nephrology"
+    },
+    "2026-11-01": {
+      "at": "2026-11-01T10:41:31.397Z",
+      "pct": null,
+      "questions": 17,
+      "status": "done",
+      "topic": "Rheumatology"
+    },
+    "2026-11-02": {
+      "at": "2026-11-02T08:05:15.866Z",
+      "pct": null,
+      "questions": 18,
+      "status": "done",
+      "topic": "Geriatrics"
+    },
+    "2026-11-03": {
+      "at": "2026-11-03T09:17:26.301Z",
+      "pct": null,
+      "questions": 15,
+      "status": "done",
+      "topic": "Cardiology"
+    },
+    "2026-11-04": {
+      "at": "2026-11-04T23:00:15.660Z",
+      "pct": null,
+      "questions": 13,
+      "status": "done",
+      "topic": "Rheumatology"
+    },
+    "2026-11-05": {
+      "at": "2026-11-05T19:04:50.150Z",
+      "pct": null,
+      "questions": 12,
+      "status": "done",
+      "topic": "Nephrology"
+    },
+    "2026-11-06": {
+      "at": "2026-11-06T06:38:14.375Z",
+      "pct": null,
+      "questions": 11,
+      "status": "done",
+      "topic": "Allergy and immunology"
+    },
+    "2026-11-07": {
+      "at": "2026-11-07T09:33:51.090Z",
+      "pct": null,
+      "questions": 10,
+      "status": "done",
+      "topic": "Review: your marked questions"
+    }
+  },
+  "days": {
+    "2026-10-31": {
+      "rough": false,
+      "type": "off"
+    },
+    "2026-11-01": {
+      "rough": false,
+      "type": "off"
+    },
+    "2026-11-02": {
+      "rough": false,
+      "type": "off"
+    }
+  },
+  "extras": {
+    "2026-11-02": {
+      "ecg": {
+        "at": "2026-11-02T20:05:03.142Z",
+        "lesson": "B1",
+        "lessons": [
+          "B1"
+        ],
+        "read": 0,
+        "right": 0
+      }
+    },
+    "2026-11-05": {
+      "anki": false,
+      "ecg": {
+        "at": "2026-11-05T20:35:28.217Z",
+        "lesson": "B2",
+        "lessons": [
+          "B2"
+        ],
+        "read": 2,
+        "right": 0
+      }
+    },
+    "2026-11-06": {
+      "ecg": {
+        "at": "2026-11-06T21:44:56.822Z",
+        "lesson": "B3",
+        "lessons": [
+          "B3"
+        ],
+        "read": 3,
+        "right": 0
+      }
+    }
+  },
+  "captures": [
+    {
+      "id": "aod75o0j0sh990zybqx2",
+      "area": "Infectious disease",
+      "checkOn": null,
+      "created": "2026-10-30",
+      "kind": "pearl",
+      "learnedOn": "2026-11-01",
+      "link": null,
+      "nextReview": "2026-11-19",
+      "q": "When to use high dose vs regular dose tige\nAnd ceftaz tige combination",
+      "stage": 1,
+      "status": "active",
+      "text": "KPC & OXA-48 → Ceftazidime-avibactam; NDM → Aztreonam-avibactam or cefiderocol; CRAB → Sulbactam-durlobactam + carbapenem (preferred), guided by susceptibility."
+    },
+    {
+      "id": "j10plssddbi8pbzg06bl",
+      "area": "Cardiology",
+      "checkOn": "2026-11-13",
+      "created": "2026-10-30",
+      "doneOn": "2026-11-05",
+      "kind": "lookup",
+      "link": null,
+      "status": "done",
+      "text": "UC management\nWhen ciclosporin"
+    },
+    {
+      "id": "w537l4r09561fp9pll7a",
+      "area": "Hematology & oncology",
+      "checkOn": "2026-11-13",
+      "created": "2026-10-30",
+      "doneOn": "2026-11-02",
+      "kind": "lookup",
+      "link": null,
+      "status": "done",
+      "text": "Icu hepatitis, ici myositis, myocarditis..."
+    }
+  ],
+  "sessions": {
+    "2026-10-26-heme-core": {
+      "date": "2026-10-26",
+      "end": "18:00",
+      "kind": "optional",
+      "place": "El-Saghir Room, D4224, ACC",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "17:00",
+      "title": "Hematology Core Curriculum",
+      "topic": "ASH series: acute myeloid leukemia"
+    },
+    "2026-10-26-nephro-core": {
+      "date": "2026-10-26",
+      "end": "15:00",
+      "kind": "optional",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "14:00",
+      "title": "Nephrology Core Curriculum",
+      "topic": "Cardiorenal syndrome"
+    },
+    "2026-10-27-cardio-core": {
+      "date": "2026-10-27",
+      "end": "08:15",
+      "kind": "optional",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "07:15",
+      "title": "Cardiology Core Curriculum",
+      "topic": "Dilated cardiomyopathy"
+    },
+    "2026-10-27-grand-rounds": {
+      "date": "2026-10-27",
+      "end": "13:00",
+      "kind": "core",
+      "place": "Khalil Auditorium, SB 06, Phase II",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "12:00",
+      "title": "Medical Grand Rounds",
+      "topic": "How to Die Young, As Late As Possible: Bridging Lifespan and Health Span"
+    },
+    "2026-10-28-ambulatory-report": {
+      "date": "2026-10-28",
+      "end": "14:00",
+      "kind": "core",
+      "place": "Khalil Auditorium, SB 06, Phase II",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "13:00",
+      "title": "Residents' Ambulatory Report",
+      "topic": ""
+    },
+    "2026-10-28-morning-report": {
+      "date": "2026-10-28",
+      "end": "12:00",
+      "kind": "core",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "11:00",
+      "title": "Residents' Morning Report",
+      "topic": "Pulmonary and critical care"
+    },
+    "2026-10-29-cardio-ecg": {
+      "date": "2026-10-29",
+      "end": "13:00",
+      "kind": "optional",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "12:00",
+      "title": "Cardiology Core Curriculum",
+      "topic": "ECG session"
+    },
+    "2026-10-29-core-curriculum": {
+      "date": "2026-10-29",
+      "end": "14:00",
+      "kind": "core",
+      "place": "Khalil Auditorium, SB 06, Phase II",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "13:00",
+      "title": "Residents' Core Curriculum",
+      "topic": "Pleural effusion"
+    },
+    "2026-10-29-endo-core": {
+      "date": "2026-10-29",
+      "end": "13:00",
+      "kind": "optional",
+      "place": "Endo Fellows Room, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "12:00",
+      "title": "Endocrinology Core Curriculum",
+      "topic": "Adrenal cancer"
+    },
+    "2026-10-30-journal-club": {
+      "date": "2026-10-30",
+      "end": "14:00",
+      "kind": "core",
+      "place": "Khalil Auditorium, SB 06, Phase II",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "13:00",
+      "title": "Residents' Journal Club",
+      "topic": "Infectious diseases"
+    },
+    "2026-10-30-morning-report": {
+      "date": "2026-10-30",
+      "end": "12:00",
+      "kind": "core",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "11:00",
+      "title": "Residents' Morning Report",
+      "topic": "Pulmonary and critical care"
+    },
+    "2026-10-30-nephro-board": {
+      "date": "2026-10-30",
+      "end": "15:00",
+      "kind": "optional",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Oct 26-30",
+      "start": "14:00",
+      "title": "Nephrology Board Review",
+      "topic": "AKI case discussions"
+    },
+    "2026-11-02-heme-core": {
+      "date": "2026-11-02",
+      "end": "18:00",
+      "kind": "optional",
+      "place": "El-Saghir Conference Room, D4224, ACC",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "17:00",
+      "title": "Hematology Core Curriculum",
+      "topic": "ASH series: aggressive B-cell lymphoma"
+    },
+    "2026-11-02-nephro-core": {
+      "date": "2026-11-02",
+      "end": "15:00",
+      "kind": "optional",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "14:00",
+      "title": "Nephrology Core Curriculum",
+      "topic": "Renal pathology session"
+    },
+    "2026-11-03-cardio-core": {
+      "date": "2026-11-03",
+      "end": "08:15",
+      "kind": "optional",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "07:15",
+      "title": "Cardiology Core Curriculum",
+      "topic": "Hypertrophic cardiomyopathy"
+    },
+    "2026-11-03-grand-rounds": {
+      "date": "2026-11-03",
+      "end": "13:00",
+      "kind": "core",
+      "place": "Khalil Auditorium, SB 06, Phase II",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "12:00",
+      "title": "Medical Grand Rounds",
+      "topic": "GERD: myths and realities"
+    },
+    "2026-11-03-onc-core": {
+      "date": "2026-11-03",
+      "end": "18:00",
+      "kind": "optional",
+      "place": "Saba Conference Room, 3002, ACC",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "17:00",
+      "title": "Oncology Core Curriculum",
+      "topic": "Melanoma"
+    },
+    "2026-11-04-clinical-reasoning": {
+      "date": "2026-11-04",
+      "end": "14:00",
+      "kind": "core",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "13:00",
+      "title": "Clinical Reasoning Session for Residents",
+      "topic": "Pulmonary and critical care"
+    },
+    "2026-11-05-cardio-ecg": {
+      "date": "2026-11-05",
+      "end": "13:00",
+      "kind": "optional",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "12:00",
+      "title": "Cardiology ECG Session",
+      "topic": ""
+    },
+    "2026-11-05-core-curriculum": {
+      "date": "2026-11-05",
+      "end": "14:00",
+      "kind": "core",
+      "place": "Khalil Auditorium, SB 06, Phase II",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "13:00",
+      "title": "Residents' Core Curriculum",
+      "topic": "Pain management"
+    },
+    "2026-11-05-endo-core": {
+      "date": "2026-11-05",
+      "end": "13:00",
+      "kind": "optional",
+      "place": "Endo Fellows Room, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "12:00",
+      "title": "Endocrinology Core Curriculum",
+      "topic": "Adrenal: chronic glucocorticoid intake guidelines"
+    },
+    "2026-11-05-morning-report": {
+      "date": "2026-11-05",
+      "end": "12:00",
+      "kind": "core",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "11:00",
+      "title": "Residents' Morning Report",
+      "topic": "Pulmonary and critical care"
+    },
+    "2026-11-06-cardio-core": {
+      "date": "2026-11-06",
+      "end": "08:30",
+      "kind": "optional",
+      "place": "Kanj Sharara Conference Room, E983, Phase II",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "07:30",
+      "title": "Cardiology Core Curriculum",
+      "topic": "Syncope and out-of-hospital cardiac arrest"
+    },
+    "2026-11-06-journal-club": {
+      "date": "2026-11-06",
+      "end": "14:00",
+      "kind": "core",
+      "place": "Khalil Auditorium, SB 06, Phase II",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "13:00",
+      "title": "Residents' Journal Club",
+      "topic": ""
+    },
+    "2026-11-06-m-and-m": {
+      "date": "2026-11-06",
+      "end": "13:00",
+      "kind": "core",
+      "place": "Khalil Auditorium, SB 06, Phase II",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "12:00",
+      "title": "Mortality and Morbidity Conference",
+      "topic": ""
+    },
+    "2026-11-06-morning-report": {
+      "date": "2026-11-06",
+      "end": "12:00",
+      "kind": "core",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "11:00",
+      "title": "Residents' Morning Report",
+      "topic": "Pulmonary and critical care"
+    },
+    "2026-11-06-nephro-board": {
+      "date": "2026-11-06",
+      "end": "15:00",
+      "kind": "optional",
+      "place": "Yammine Library, W502, Phase I",
+      "source": "Weekly Teaching Activities email, Nov 2-6",
+      "start": "14:00",
+      "title": "Nephrology Board Review",
+      "topic": "CKD: staging, evaluation and management cases"
+    }
+  },
+  "settings": {
+    "amboss": {
+      "answered": 86,
+      "asOf": "2026-11-08",
+      "checkedAt": "2026-11-08T08:40:02Z",
+      "epc": 77.5,
+      "note": "Since the 2026-10-30 reset. 86 unique questions (96 attempts incl. the Nov 7 marked-question review), matching his logs.",
+      "pct": 76,
+      "percentile": 48,
+      "total": 2084
+    },
+    "examLabel": "In-training exam",
+    "examMonth": "August 2027",
+    "minDay": 10,
+    "weeklyTarget": 60
+  },
+  "ecg": {
+    "assessments": [],
+    "done": {
+      "B1": "2026-11-02",
+      "B2": "2026-11-05",
+      "B3": "2026-11-06"
+    },
+    "focus": "Blue Belt B4 to B6 this week: quiz first, watch only what you miss. Fit the 20-ECG baseline check-up into a free day and send me the score.",
+    "localFolder": "OneDrive Desktop > medmastery (Yellow Belt, Blue Belt older 10-level version, Black Belt Workshop 68 cases)",
+    "owned": [
+      "blue",
+      "black"
+    ],
+    "ownedConfirmed": true,
+    "phases": [
+      {
+        "from": "2026-11-02",
+        "goal": "Baseline check-up first (20 unseen Wave-Maven ECGs). Then Blue Belt test-out: do each level's quiz before the video and watch only where you miss something. Yellow Belt is done; open it only if the baseline shows gaps.",
+        "name": "Phase 1: Refresh",
+        "to": "2026-11-30"
+      },
+      {
+        "from": "2026-12-01",
+        "goal": "The 68 Black Belt Workshop cases, 3 a session: pause on each ECG and write your read before the explanation. In ED, read every ECG before the machine read. On CCU, bring one tracing a week to a fellow. Nothing due on vacation. Check-up 2 when the cases are done.",
+        "name": "Phase 2: Black Belt cases",
+        "to": "2027-02-08"
+      },
+      {
+        "from": "2027-02-09",
+        "goal": "Unseen LITFL cases weighted to occlusion MI: Sgarbossa, Wellens, de Winter, posterior and RV MI, plus WPW and Brugada. One Dr Smith blog case a week. Weekly tracing review on CCU in February.",
+        "name": "Phase 3: Ischemia deep dive",
+        "to": "2027-04-19"
+      },
+      {
+        "from": "2027-04-20",
+        "goal": "Before and during ICU: hyperkalemia, TCA and digoxin toxicity, QT drugs, hypothermia. May electives: laddergrams, AV dissociation, pacemaker problems. Check-up 3 at the end of May.",
+        "name": "Phase 4: ICU and electrophysiology",
+        "to": "2027-05-31"
+      },
+      {
+        "from": "2027-06-01",
+        "goal": "CCU. A look back at your check-ups and weak spots, then PGY3 maintenance: 2 sessions a week.",
+        "name": "Phase 5: Year-end",
+        "to": "2027-06-13"
+      }
+    ],
+    "planDoc": "https://claude.ai/artifact/2NLTka85DHiNeCY9NyVwVr",
+    "priorCompleted": [
+      "yellow",
+      "blue"
+    ],
+    "start": "2026-11-02",
+    "weeklyGoal": 3
+  }
+}
